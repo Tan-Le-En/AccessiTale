@@ -7,11 +7,6 @@ import {
   Zap, Type, ZoomIn, Smile, BookOpen, Keyboard, SkipForward, ChevronLeft,
   Timer, Eye, ChevronRight,
 } from 'lucide-react';
-import malayDictData from '../malay-english-dict.json';
-import chineseDictData from '../Dictionary.json';
-
-const MALAY_DICT = malayDictData;
-const CHINESE_DICT = chineseDictData;
 
 /* =====================================================
    THEME
@@ -531,6 +526,24 @@ function speakOnce(text, rate, voiceUri, language) {
 }
 
 /* =====================================================
+   LAZY-LOADED DICTIONARIES
+===================================================== */
+const DictCtx = createContext({ malay: {}, chinese: {} });
+function useDict() { return useContext(DictCtx); }
+
+function DictProvider({ children }) {
+  const [malay, setMalay] = useState({});
+  const [chinese, setChinese] = useState({});
+
+  useEffect(() => {
+    fetch('/malay-english-dict.json').then((r) => r.json()).then(setMalay).catch(() => {});
+    fetch('/Dictionary.json').then((r) => r.json()).then(setChinese).catch(() => {});
+  }, []);
+
+  return <DictCtx.Provider value={{ malay, chinese }}>{children}</DictCtx.Provider>;
+}
+
+/* =====================================================
    APP CONTEXT
 ===================================================== */
 const AppCtx = createContext(null);
@@ -769,6 +782,7 @@ const LOCAL_DICTIONARY = {"anopheles":"A genus of mosquitoes which are secondary
 function useDictionaryLookup() {
   const cacheRef = useRef({});
   const [popover, setPopover] = useState(null);
+  const { malay: MALAY_DICT, chinese: CHINESE_DICT } = useDict();
 
   const lookup = useCallback((word, event) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -1716,6 +1730,7 @@ export default function App() {
   else if (view === 'practice') ViewComponent = PracticeView;
 
   return (
+    <DictProvider>
     <AppCtx.Provider value={ctxValue}>
       <style>{`
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -1736,5 +1751,6 @@ export default function App() {
         <SettingsPanel />
       </div>
     </AppCtx.Provider>
+    </DictProvider>
   );
 }
