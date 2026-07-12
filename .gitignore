@@ -1,4 +1,6 @@
 node_modules/
+dist/
+.vercel/
 200k-english-malay.json
 MalayDictionary.zip
 Malay Dictionary.crdownload
@@ -6,3 +8,4 @@ MalayDictExtracted/
 tts_cache/
 *.mp3
 *.mp4
+AccessiTale (1).jsx
