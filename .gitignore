@@ -1,0 +1,8 @@
+node_modules/
+200k-english-malay.json
+MalayDictionary.zip
+Malay Dictionary.crdownload
+MalayDictExtracted/
+tts_cache/
+*.mp3
+*.mp4
