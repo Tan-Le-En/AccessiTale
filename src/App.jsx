@@ -80,6 +80,7 @@ const STR = {
     wpm: 'WPM', tapWhenReady: 'Tap when ready', typeSentence: 'Now type the sentence from memory:',
     correct: 'Correct!', almost: 'Almost!', keepTrying: 'Keep trying!',
     voiceName: 'Narrator Voice', defaultVoice: 'System Default',
+    trySample: 'Try a Sample', sampleDesc: 'Quick-start with a pre-loaded story',
   },
   ms: {
     appName: 'AccessiTale', newStory: '+ Cerita Baharu',
@@ -111,6 +112,7 @@ const STR = {
     wpm: 'Perkataan/minit', tapWhenReady: 'Ketik apabila sedia', typeSentence: 'Sekarang taip ayat dari ingatan:',
     correct: 'Betul!', almost: 'Hampir!', keepTrying: 'Terus mencuba!',
     voiceName: 'Suara Pencerita', defaultVoice: 'Sistem Lalai',
+    trySample: 'Cuba Contoh', sampleDesc: 'Mulakan dengan cerita sedia ada',
   },
   zh: {
     appName: 'AccessiTale', newStory: '+ 新故事',
@@ -142,6 +144,7 @@ const STR = {
     wpm: '字/分钟', tapWhenReady: '准备好后点击', typeSentence: '现在凭记忆输入句子：',
     correct: '正确！', almost: '差不多！', keepTrying: '继续加油！',
     voiceName: '朗读语音', defaultVoice: '系统默认',
+    trySample: '试试示例', sampleDesc: '使用预设故事快速开始',
   },
 };
 
@@ -404,7 +407,7 @@ function useNarrator(sentences, rate, voiceUri, language) {
     stoppedRef.current = false;
     idxRef.current = startIdx;
 
-    const useTTS = language === 'ms';
+    const useTTS = language === 'ms' || language === 'zh';
 
     const speakNext = async () => {
       if (stoppedRef.current) return;
@@ -422,7 +425,7 @@ function useNarrator(sentences, rate, voiceUri, language) {
           const resp = await fetch('/api/tts', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text, voice: 'ms', rate }),
+            body: JSON.stringify({ text, voice: language, rate }),
           });
           if (!resp.ok) throw new Error('TTS failed');
           const blob = await resp.blob();
@@ -497,11 +500,11 @@ function speakOnce(text, rate, voiceUri, language) {
   if (typeof window === 'undefined' || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
 
-  if (language === 'ms') {
+  if (language === 'ms' || language === 'zh') {
     fetch('/api/tts', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, voice: 'ms', rate }),
+      body: JSON.stringify({ text, voice: language, rate }),
     }).then((r) => r.ok ? r.blob() : Promise.reject()).then((blob) => {
       const url = URL.createObjectURL(blob);
       const audio = new Audio(url);
@@ -987,6 +990,53 @@ function StoryText({ content, settings, highlightIdx = -1, centered = false, tex
 }
 
 /* =====================================================
+   SAMPLE SCRIPTS
+===================================================== */
+const SAMPLE_SCRIPTS = [
+  {
+    id: 'sample-en',
+    title: 'The Little Star',
+    content: 'Once upon a time, high up in the night sky, there lived a little star. Every evening, she would shine the brightest among all her brothers and sisters. One cloudy night, a young boy looked up and whispered, "I wish I could be brave like you." The little star twinkled with joy, knowing that even the smallest light can guide someone through the darkness.',
+    lang: 'en', flag: '\u{1F1EC}\u{1F1E7}',
+    labelEn: 'English Sample', labelMs: 'Contoh Bahasa Inggeris', labelZh: '英文示例',
+  },
+  {
+    id: 'sample-ms',
+    title: 'Bintang Kecil',
+    content: 'Pada suatu masa dahulu, jauh di atas langit malam, ada seekor bintang kecil. Setiap petang, dia akan bersinar paling terang di antara semua adik-beradiknya. Pada suatu malam yang berawan, seorang budak lelaki melihat ke atas dan berbisik, "Saya ingin menjadi seberani awak." Bintang kecil itu berkelip-kelip dengan gembira, kerana mengetahui bahawa walaupun cahaya yang paling kecil boleh membimbing seseorang melalui kegelapan.',
+    lang: 'ms', flag: '\u{1F1F2}\u{1F1FE}',
+    labelEn: 'Malay Sample', labelMs: 'Contoh Bahasa Melayu', labelZh: '马来文示例',
+  },
+  {
+    id: 'sample-zh',
+    title: '\u5C0F\u661F\u661F\u7684\u6545\u4E8B',
+    content: '\u5F88\u4E45\u5F88\u4E45\u4EE5\u524D\uFF0C\u5728\u9AD8\u9AD8\u7684\u591C\u7A7A\u4E0A\uFF0C\u4F4F\u7740\u4E00\u9897\u5C0F\u661F\u661F\u3002\u6BCF\u5929\u665A\u4E0A\uFF0C\u5979\u90FD\u4F1A\u5728\u6240\u6709\u5144\u5F1F\u59B0\u59B0\u4E2D\u53D1\u51FA\u6700\u4EAE\u7684\u5149\u8292\u3002\u4E00\u5929\u665A\u4E0A\uFF0C\u4E00\u4E2A\u5C0F\u7537\u5B69\u62AC\u5934\u770B\u7740\u5929\u7A7A\uFF0C\u8F7B\u58F0\u8BF4\u9053\uFF1A\u201C\u6211\u5E0C\u671B\u6211\u80FD\u50CF\u4F60\u4E00\u6837\u52C7\u6562\u3002\u201D\u5C0F\u661F\u661F\u5F00\u5FC3\u5730\u95EA\u70C1\u7740\uFF0C\u56E0\u4E3A\u5979\u77E5\u9053\u5373\u4F7F\u662F\u6700\u5FAE\u5C0F\u7684\u5149\u8292\uFF0C\u4E5F\u80FD\u5728\u9ED1\u6697\u4E2D\u4E3A\u67D0\u4E2A\u4EBA\u6307\u5F15\u65B9\u5411\u3002',
+    lang: 'zh', flag: '\u{1F1E8}\u{1F1F3}',
+    labelEn: 'Chinese Sample', labelMs: 'Contoh Bahasa Cina', labelZh: '中文示例',
+  },
+];
+
+/* =====================================================
+   TOP BAR (Global — all pages)
+===================================================== */
+function TopBar() {
+  const { theme, t, setView, setShowSettings } = useApp();
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 24px' }}>
+      <button type="button" onClick={() => setView('library')}
+        style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+        aria-label={t.appName + ' — ' + t.back}>
+        <div style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: theme.accent, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <BookOpen size={20} color="#fff" aria-hidden="true" />
+        </div>
+        <span style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 20, color: theme.textPrimary }}>{t.appName}</span>
+      </button>
+      <IconButton icon={SettingsIcon} label={t.settings} onClick={() => setShowSettings(true)} />
+    </div>
+  );
+}
+
+/* =====================================================
    HEADER (Library only)
 ===================================================== */
 function Header({ onNewStory }) {
@@ -1054,7 +1104,7 @@ function coverFor(id) {
 }
 
 function LibraryView() {
-  const { theme, t, stories, setStories, setView, setCurrentStoryId } = useApp();
+  const { theme, t, language, stories, setStories, setView, setCurrentStoryId } = useApp();
 
   const handleNewStory = () => {
     const id = `story-${Date.now()}`;
@@ -1073,6 +1123,14 @@ function LibraryView() {
     setStories((prev) => prev.filter((s) => s.id !== id));
   };
 
+  const loadSample = (sample) => {
+    const id = `story-${Date.now()}`;
+    const labelKey = language === 'ms' ? 'labelMs' : language === 'zh' ? 'labelZh' : 'labelEn';
+    setStories((prev) => [{ id, title: sample.title, content: sample.content, accessible: true, createdAt: Date.now() }, ...prev]);
+    setCurrentStoryId(id);
+    setView('read');
+  };
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: theme.bg }}>
       <Header onNewStory={handleNewStory} />
@@ -1081,6 +1139,20 @@ function LibraryView() {
           <Button variant="primary" fullWidth onClick={handleNewStory}>
             <Plus size={20} aria-hidden="true" /> {t.newStory.replace('+ ', '')}
           </Button>
+        </div>
+        <div style={{ marginBottom: 28 }}>
+          <p style={{ fontFamily: "'Quicksand', sans-serif", fontSize: 14, fontWeight: 600, color: theme.textSecondary, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t.trySample}</p>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            {SAMPLE_SCRIPTS.map((sample) => (
+              <button key={sample.id} type="button" onClick={() => loadSample(sample)}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', borderRadius: 14, border: `2px solid ${withAlpha(theme.accent, 0.3)}`, backgroundColor: withAlpha(theme.accent, 0.08), cursor: 'pointer', fontFamily: "'Quicksand', sans-serif", fontWeight: 600, fontSize: 15, color: theme.textPrimary, transition: 'background-color 180ms ease-out, border-color 180ms ease-out', minHeight: 44 }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = withAlpha(theme.accent, 0.18); e.currentTarget.style.borderColor = theme.accent; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = withAlpha(theme.accent, 0.08); e.currentTarget.style.borderColor = withAlpha(theme.accent, 0.3); }}>
+                <span aria-hidden="true" style={{ fontSize: 18 }}>{sample.flag}</span>
+                <span>{sample.title}</span>
+              </button>
+            ))}
+          </div>
         </div>
         {stories.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '64px 16px' }}>
@@ -1169,10 +1241,11 @@ function WriteView() {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: theme.bg, display: 'flex', flexDirection: 'column' }}>
-      <div style={{ padding: '16px 24px' }}>
-        <IconButton icon={ArrowLeft} label={t.back} onClick={handleBack} />
-      </div>
+      <TopBar />
       <div style={{ flex: 1, maxWidth: 640, margin: '0 auto', width: '100%', padding: '0 24px 120px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <IconButton icon={ArrowLeft} label={t.back} onClick={handleBack} />
+        </div>
         <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t.titlePlaceholder} aria-label={t.titlePlaceholder}
           style={{ width: '100%', border: 'none', outline: 'none', background: 'transparent', fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 32, color: theme.textPrimary, marginBottom: 16, padding: '8px 0' }} />
         <div style={{ position: 'relative' }}>
@@ -1226,7 +1299,8 @@ function ReadingView() {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: theme.bg }}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 24px' }}>
+      <TopBar />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px 8px' }}>
         <IconButton icon={ArrowLeft} label={t.back} onClick={() => setView('library')} />
         <h1 style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 22, color: theme.textPrimary, textAlign: 'center', flex: 1, margin: '0 8px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
           {story.title || t.untitled}
@@ -1285,10 +1359,11 @@ function FocusMode() {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: theme.bg, display: 'flex', flexDirection: 'column' }}>
+      <TopBar />
       <div style={{ height: 4, backgroundColor: withAlpha(theme.textSecondary, 0.2) }}>
         <div style={{ height: '100%', width: `${progress}%`, backgroundColor: theme.accent, transition: 'width 200ms ease-out' }} />
       </div>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: 16 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 16px 8px' }}>
         <IconButton icon={X} label={t.exitFocus} onClick={() => { narrator.stop(); setView('read'); }} />
       </div>
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 24px 100px', overflowY: 'auto' }}>
@@ -1339,6 +1414,7 @@ function PracticeView() {
   if (sentences.length === 0) {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: theme.bg, display: 'flex', flexDirection: 'column' }}>
+        <TopBar />
         <div style={{ padding: 16 }}><IconButton icon={ArrowLeft} label={t.back} onClick={() => setView('read')} /></div>
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, textAlign: 'center' }}>
           <p style={{ fontFamily: "'Quicksand', sans-serif", fontSize: 18, color: theme.textSecondary, maxWidth: 360 }}>{t.noSentences}</p>
@@ -1350,6 +1426,7 @@ function PracticeView() {
   if (!mode) {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: theme.bg, display: 'flex', flexDirection: 'column' }}>
+        <TopBar />
         <div style={{ padding: 16 }}><IconButton icon={ArrowLeft} label={t.back} onClick={() => setView('read')} /></div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, gap: 20 }}>
           <div style={{ fontSize: 48 }} aria-hidden="true">📖</div>
@@ -1430,6 +1507,7 @@ function PracticeView() {
   if (phase === 'done') {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: theme.bg, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24, textAlign: 'center' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0 }}><TopBar /></div>
         <div style={{ fontSize: 56, marginBottom: 16 }} aria-hidden="true">🎉</div>
         <h1 style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 26, color: theme.textPrimary, marginBottom: 8 }}>{t.practiceComplete}</h1>
         <p style={{ fontFamily: "'Quicksand', sans-serif", fontSize: 17, color: theme.textSecondary, marginBottom: 24 }}>{t.practiceCompleteBody}</p>
@@ -1440,8 +1518,9 @@ function PracticeView() {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: theme.bg, display: 'flex', flexDirection: 'column' }}>
+      <TopBar />
       <div aria-live="polite" style={srOnlyStyle()}>{announcement}</div>
-      <div style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{ padding: '0 16px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
         <IconButton icon={ArrowLeft} label={t.back} onClick={() => setView('read')} />
         <div style={{ display: 'flex', gap: 6 }}>
           <button type="button" onClick={() => { setMode('typeCheck'); resetSentence(); }}
@@ -1512,6 +1591,7 @@ function PracticeView() {
             <textarea
               value={typedValue} onChange={(e) => setTypedValue(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleTypeSubmit(); } }}
+              onPaste={(e) => e.preventDefault()}
               placeholder={t.typeWhatYouRead}
               autoFocus
               rows={3}
