@@ -5,7 +5,8 @@ import {
   Home, Plus, Settings as SettingsIcon, Globe, ArrowLeft, Play, Pause, Mic,
   Volume2, X, Check, RotateCcw, ArrowRight, Sparkles, Maximize2, Star,
   Zap, Type, ZoomIn, Smile, BookOpen, Keyboard, SkipForward, ChevronLeft,
-  Timer, Eye, ChevronRight,
+  Timer, Eye, ChevronRight, Headphones, Languages, Target, PenTool,
+  BookMarked, Volume, Ear, FileText,
 } from 'lucide-react';
 
 /* =====================================================
@@ -1146,11 +1147,11 @@ function Header({ onNewStory }) {
    LANDING VIEW
 ===================================================== */
 function LandingView() {
-  const { setView, theme, stories } = useApp();
+  const { setView } = useApp();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
+    const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
@@ -1158,174 +1159,126 @@ function LandingView() {
   const goApp = () => setView('library');
 
   const features = [
-    { icon: '🔤', title: 'Bionic Reading', desc: 'Bold the first few letters of every word so your eyes glide through text effortlessly.' },
-    { icon: '😊', title: 'Emoji Visualizer', desc: 'See words come alive with auto-mapped emojis — reading becomes visual storytelling.' },
-    { icon: '🌐', title: '3 Languages', desc: 'Full support for English, Malay, and Chinese with native neural TTS voices.' },
-    { icon: '🎙\uFE0F', title: 'Listen & Repeat', desc: 'Hear a sentence read aloud, then record yourself — AI scores your pronunciation.' },
-    { icon: '🎯', title: 'Focus Mode', desc: 'Distraction-free reading with sentence-by-sentence highlighting and narration.' },
-    { icon: '📝', title: 'Type & Check', desc: 'Type what you heard and get instant feedback on accuracy with highlighted corrections.' },
+    { icon: <Type size={24} strokeWidth={2} />, title: 'Bionic Reading', desc: 'Bold the first few letters of every word so your eyes glide through text effortlessly.' },
+    { icon: <Smile size={24} strokeWidth={2} />, title: 'Emoji Visualizer', desc: 'Words come alive with auto-mapped emojis, turning reading into visual storytelling.' },
+    { icon: <Languages size={24} strokeWidth={2} />, title: '3 Languages', desc: 'Full support for English, Malay, and Chinese with native neural TTS voices.' },
+    { icon: <Headphones size={24} strokeWidth={2} />, title: 'Listen & Repeat', desc: 'Hear sentences read aloud, then record yourself. AI scores your pronunciation.' },
+    { icon: <Eye size={24} strokeWidth={2} />, title: 'Focus Mode', desc: 'Distraction-free reading with sentence-by-sentence highlighting and narration.' },
+    { icon: <PenTool size={24} strokeWidth={2} />, title: 'Type & Check', desc: 'Type what you heard and get instant feedback on accuracy with highlighted corrections.' },
   ];
 
   const steps = [
-    { num: '01', title: 'Paste or write your story', desc: 'Drop in any text — a novel chapter, study notes, or a news article.' },
+    { num: '01', title: 'Paste or write your story', desc: 'Drop in any text \u2014 a novel chapter, study notes, or a news article.' },
     { num: '02', title: 'Make it Accessible', desc: 'One click transforms your text with bionic formatting, emoji overlays, and narration.' },
     { num: '03', title: 'Read, listen, practice', desc: 'Enjoy focus mode, listen to natural voices, or practice pronunciation.' },
   ];
 
-  const stats = [
-    { value: '3', label: 'Languages' },
-    { value: '100%', label: 'Free Forever' },
-    { value: '<1s', label: 'Setup Time' },
-    { value: '\u221E', label: 'Stories' },
-  ];
-
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#0A0A0A', color: '#FAFAFA', fontFamily: "'Poppins', sans-serif", overflowX: 'hidden' }}>
-      <style>{`
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-        @keyframes glow { 0%, 100% { box-shadow: 0 0 30px rgba(255,138,101,0.2); } 50% { box-shadow: 0 0 60px rgba(255,138,101,0.4); } }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-        .landing-fade-up { animation: fadeInUp 0.7s ease-out both; }
-        .landing-fade-up-d1 { animation: fadeInUp 0.7s 0.1s ease-out both; }
-        .landing-fade-up-d2 { animation: fadeInUp 0.7s 0.2s ease-out both; }
-        .landing-fade-up-d3 { animation: fadeInUp 0.7s 0.3s ease-out both; }
-        .landing-fade-up-d4 { animation: fadeInUp 0.7s 0.4s ease-out both; }
-        .landing-float { animation: float 6s ease-in-out infinite; }
-        .landing-float-d1 { animation: float 6s 0.5s ease-in-out infinite; }
-        .landing-float-d2 { animation: float 6s 1s ease-in-out infinite; }
-        .landing-glow { animation: glow 3s ease-in-out infinite; }
-        .landing-shimmer { background: linear-gradient(90deg, transparent 30%, rgba(255,255,255,0.08) 50%, transparent 70%); background-size: 200% 100%; animation: shimmer 3s infinite; }
-      `}</style>
+    <div style={{ minHeight: '100vh', backgroundColor: '#FFFBEB', fontFamily: "'Plus Jakarta Sans', 'Quicksand', sans-serif", overflowX: 'hidden' }}>
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
       {/* Nav */}
-      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, padding: '0 32px', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', backdropFilter: scrolled ? 'blur(20px) saturate(180%)' : 'none', backgroundColor: scrolled ? 'rgba(10,10,10,0.85)' : 'transparent', borderBottom: scrolled ? '1px solid rgba(255,255,255,0.06)' : '1px solid transparent', transition: 'all 0.3s ease' }}>
+      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, padding: '0 clamp(20px, 4vw, 48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: scrolled ? 'rgba(255,251,235,0.95)' : 'transparent', backdropFilter: scrolled ? 'blur(8px)' : 'none', borderBottom: scrolled ? '1px solid #EEEDED' : '1px solid transparent', transition: 'background-color 200ms ease, border-color 200ms ease, backdrop-filter 200ms ease' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }} onClick={goApp}>
-            <span style={{ fontSize: 24 }}>📖</span>
-            <span style={{ fontFamily: "'Quicksand', sans-serif", fontWeight: 700, fontSize: 22, color: '#fff' }}>AccessiTale</span>
+          <BookOpen size={22} strokeWidth={2.2} color="#92400E" />
+          <span style={{ fontWeight: 800, fontSize: 20, color: '#0F172A', letterSpacing: '-0.02em' }}>AccessiTale</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
-          <a href="#features" onClick={(e) => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: 14, fontWeight: 500, transition: 'color 0.2s', fontFamily: "'Quicksand', sans-serif" }}>Features</a>
-          <a href="#how" onClick={(e) => { e.preventDefault(); document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: 14, fontWeight: 500, transition: 'color 0.2s', fontFamily: "'Quicksand', sans-serif" }}>How It Works</a>
-          {stories.length > 0 && (
-            <button onClick={goApp} style={{ background: 'transparent', color: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.15)', padding: '8px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Quicksand', sans-serif", transition: 'all 0.2s' }}
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; e.currentTarget.style.color = '#fff'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}>Continue to App</button>
-          )}
-          <button onClick={goApp} style={{ background: 'linear-gradient(135deg, #FF8A65, #FF7043)', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "'Quicksand', sans-serif", transition: 'transform 0.2s, box-shadow 0.2s', letterSpacing: '0.02em' }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(255,138,101,0.4)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}>Try It Out</button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
+          <a href="#features" onClick={(e) => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#78716C', textDecoration: 'none', fontSize: 14, fontWeight: 500, transition: 'color 150ms ease' }}>Features</a>
+          <a href="#how" onClick={(e) => { e.preventDefault(); document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#78716C', textDecoration: 'none', fontSize: 14, fontWeight: 500, transition: 'color 150ms ease' }}>How It Works</a>
+          <button onClick={goApp} style={{ backgroundColor: '#D97706', color: '#FFFFFF', border: 'none', padding: '10px 24px', borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'background-color 150ms ease, opacity 150ms ease', letterSpacing: '0.01em' }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#92400E'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#D97706'; }}>Try It Out</button>
         </div>
       </nav>
 
       {/* Hero */}
-      <section style={{ position: 'relative', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '120px 24px 80px', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: '15%', left: '50%', transform: 'translate(-50%, -50%)', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,138,101,0.15) 0%, transparent 70%)', filter: 'blur(60px)', pointerEvents: 'none' }} />
-        <div style={{ position: 'absolute', top: '40%', right: '15%', width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(77,182,172,0.1) 0%, transparent 70%)', filter: 'blur(40px)', pointerEvents: 'none' }} />
+      <section style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', padding: '100px 20px 80px', position: 'relative' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'radial-gradient(ellipse at 50% 0%, rgba(217,119,6,0.06) 0%, transparent 60%)', pointerEvents: 'none' }} />
 
-        <div className="landing-fade-up" style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '8px 18px', borderRadius: 999, border: '1px solid rgba(255,138,101,0.3)', backgroundColor: 'rgba(255,138,101,0.08)', marginBottom: 32 }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: '#4DB6AC', display: 'inline-block' }} />
-            <span style={{ fontSize: 13, fontWeight: 600, color: 'rgba(255,255,255,0.8)', fontFamily: "'Quicksand', sans-serif" }}>Free & Open Source</span>
+        <div style={{ position: 'relative', zIndex: 1, maxWidth: 720, margin: '0 auto' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '6px 14px', borderRadius: 6, border: '1px solid #EEEDED', backgroundColor: '#FFFFFF', marginBottom: 28 }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#16A34A', display: 'inline-block' }} />
+            <span style={{ fontSize: 12, fontWeight: 600, color: '#78716C', letterSpacing: '0.04em', textTransform: 'uppercase' }}>Free & Open Source</span>
           </div>
+
+          <h1 style={{ fontSize: 'clamp(36px, 6vw, 64px)', fontWeight: 800, lineHeight: 1.1, margin: '0 0 20px', color: '#0F172A', letterSpacing: '-0.03em' }}>
+            Reading Made{' '}
+            <span style={{ color: '#D97706' }}>Effortless</span>
+          </h1>
+
+          <p style={{ fontSize: 'clamp(16px, 2vw, 19px)', color: '#78716C', lineHeight: 1.65, maxWidth: 520, margin: '0 auto 40px', fontWeight: 400 }}>
+            Bionic reading, emoji overlays, and AI narration. Transform any text into an accessible, immersive experience in English, Malay, and Chinese.
+          </p>
+
+          <button onClick={goApp} style={{ backgroundColor: '#D97706', color: '#FFFFFF', border: 'none', padding: '16px 48px', borderRadius: 8, fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'background-color 150ms ease', letterSpacing: '0.01em' }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#92400E'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#D97706'; }}>Try It Out</button>
         </div>
 
-        <h1 className="landing-fade-up-d1" style={{ position: 'relative', zIndex: 1, fontSize: 'clamp(40px, 7vw, 80px)', fontWeight: 800, lineHeight: 1.08, margin: '0 auto 24px', maxWidth: 860, letterSpacing: '-0.03em' }}>
-          <span style={{ background: 'linear-gradient(135deg, #FFFFFF 30%, #FF8A65 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Reading Made </span>
-          <span style={{ background: 'linear-gradient(135deg, #FF8A65, #FFB74D)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Effortless</span>
-        </h1>
-
-        <p className="landing-fade-up-d2" style={{ position: 'relative', zIndex: 1, fontSize: 'clamp(16px, 2vw, 20px)', color: 'rgba(255,255,255,0.55)', lineHeight: 1.7, maxWidth: 560, margin: '0 auto 48px', fontFamily: "'Quicksand', sans-serif", fontWeight: 500 }}>
-          Bionic reading, emoji overlays, and AI narration — transforming any text into an accessible, immersive experience in English, Malay, and Chinese.
-        </p>
-
-        <div className="landing-fade-up-d3" style={{ position: 'relative', zIndex: 1, display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center' }}>
-          <button onClick={goApp} className="landing-glow" style={{ background: 'linear-gradient(135deg, #FF8A65, #FF7043)', color: '#fff', border: 'none', padding: '18px 48px', borderRadius: 16, fontSize: 18, fontWeight: 700, cursor: 'pointer', fontFamily: "'Quicksand', sans-serif", transition: 'transform 0.2s', letterSpacing: '0.02em' }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}>Try It Out \u2192</button>
-        </div>
-
-        {/* Floating Preview Cards */}
-        <div className="landing-fade-up-d4" style={{ position: 'relative', zIndex: 1, marginTop: 72, width: '100%', maxWidth: 800 }}>
-          <div className="landing-float" style={{ backgroundColor: '#1A1A1A', borderRadius: 20, padding: '32px 40px', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 20px 60px rgba(0,0,0,0.5)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 20 }}>
-              <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#FF5F57' }} />
-              <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#FFBD2E' }} />
-              <div style={{ width: 12, height: 12, borderRadius: '50%', backgroundColor: '#28C840' }} />
+        {/* Preview Card */}
+        <div style={{ position: 'relative', zIndex: 1, marginTop: 56, width: '100%', maxWidth: 640, padding: '0 20px' }}>
+          <div style={{ backgroundColor: '#FFFFFF', borderRadius: 12, padding: '28px 32px', border: '1px solid #EEEDED' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 20 }}>
+              <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#F87171' }} />
+              <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#FBBF24' }} />
+              <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#34D399' }} />
             </div>
-            <div style={{ fontFamily: "'Lexend', monospace", fontSize: 'clamp(16px, 2.5vw, 24px)', lineHeight: 1.8, color: 'rgba(255,255,255,0.9)' }}>
-              <span style={{ fontWeight: 800 }}>O</span>nce <span style={{ fontWeight: 800 }}>up</span>on <span style={{ fontWeight: 800 }}>a</span> <span style={{ fontWeight: 800 }}>tim</span>e, <span style={{ fontWeight: 800 }}>the</span>re <span style={{ fontWeight: 800 }}>liv</span>ed <span style={{ fontWeight: 800 }}>a</span> <span style={{ fontWeight: 800 }}>brav</span>e <span style={{ fontWeight: 800 }}>litt</span>le               <span style={{ fontWeight: 800 }}>st</span>ar <span style={{ fontSize: 20 }}>⭐</span> <span style={{ fontWeight: 800 }}>`wh</span>o <span style={{ fontWeight: 800 }}>dre</span>amt <span style={{ fontWeight: 800 }}>o</span>f <span style={{ fontWeight: 800 }}>dan</span>cing <span style={{ fontSize: 20 }}>💃</span> <span style={{ fontWeight: 800 }}>wit</span>h <span style={{ fontWeight: 800 }}>the</span> <span style={{ fontWeight: 800 }}>wol</span>ves <span style={{ fontSize: 20 }}>🐺</span>
+            <div style={{ fontFamily: "'Lexend', monospace", fontSize: 'clamp(15px, 2.2vw, 20px)', lineHeight: 1.8, color: '#0F172A' }}>
+              <span style={{ fontWeight: 800 }}>O</span>nce <span style={{ fontWeight: 800 }}>up</span>on <span style={{ fontWeight: 800 }}>a</span> <span style={{ fontWeight: 800 }}>tim</span>e, <span style={{ fontWeight: 800 }}>the</span>re <span style={{ fontWeight: 800 }}>liv</span>ed <span style={{ fontWeight: 800 }}>a</span> <span style={{ fontWeight: 800 }}>brav</span>e <span style={{ fontWeight: 800 }}>litt</span>le <span style={{ fontWeight: 800 }}>st</span>ar <Star size={16} strokeWidth={2.5} color="#D97706" style={{ display: 'inline', verticalAlign: 'middle' }} /> <span style={{ fontWeight: 800 }}>wh</span>o <span style={{ fontWeight: 800 }}>dre</span>amt <span style={{ fontWeight: 800 }}>o</span>f <span style={{ fontWeight: 800 }}>dan</span>cing <Smile size={16} strokeWidth={2.5} color="#D97706" style={{ display: 'inline', verticalAlign: 'middle' }} /> <span style={{ fontWeight: 800 }}>wit</span>h <span style={{ fontWeight: 800 }}>the</span> <span style={{ fontWeight: 800 }}>wol</span>ves
             </div>
-            <div style={{ display: 'flex', gap: 12, marginTop: 20, alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 8, backgroundColor: 'rgba(255,138,101,0.15)', border: '1px solid rgba(255,138,101,0.3)' }}>
-                <span style={{ fontSize: 13, color: '#FF8A65', fontWeight: 600, fontFamily: "'Quicksand', sans-serif" }}>🔤 Bionic</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 8, backgroundColor: 'rgba(77,182,172,0.15)', border: '1px solid rgba(77,182,172,0.3)' }}>
-                <span style={{ fontSize: 13, color: '#4DB6AC', fontWeight: 600, fontFamily: "'Quicksand', sans-serif" }}>😊 Emoji</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 8, backgroundColor: 'rgba(255,183,77,0.15)', border: '1px solid rgba(255,183,77,0.3)' }}>
-                <span style={{ fontSize: 13, color: '#FFB74D', fontWeight: 600, fontFamily: "'Quicksand', sans-serif" }}>🌐 EN</span>
-              </div>
+            <div style={{ display: 'flex', gap: 8, marginTop: 20, flexWrap: 'wrap' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', borderRadius: 6, backgroundColor: '#FFFBEB', border: '1px solid #FDE68A', fontSize: 12, fontWeight: 600, color: '#92400E' }}><Type size={13} strokeWidth={2.5} /> Bionic</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', borderRadius: 6, backgroundColor: '#FFFBEB', border: '1px solid #FDE68A', fontSize: 12, fontWeight: 600, color: '#92400E' }}><Smile size={13} strokeWidth={2.5} /> Emoji</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', borderRadius: 6, backgroundColor: '#FFFBEB', border: '1px solid #FDE68A', fontSize: 12, fontWeight: 600, color: '#92400E' }}><Globe size={13} strokeWidth={2.5} /> EN</span>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section style={{ padding: '60px 24px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(24px, 6vw, 80px)', flexWrap: 'wrap', maxWidth: 800, margin: '0 auto' }}>
-          {stats.map((s, i) => (
-            <div key={i} style={{ textAlign: 'center', minWidth: 100 }}>
-              <div style={{ fontSize: 'clamp(32px, 4vw, 48px)', fontWeight: 800, background: 'linear-gradient(135deg, #FF8A65, #FFB74D)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', fontFamily: "'Quicksand', sans-serif" }}>{s.value}</div>
-              <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', fontWeight: 600, marginTop: 4, fontFamily: "'Quicksand', sans-serif" }}>{s.label}</div>
-            </div>
-          ))}
         </div>
       </section>
 
       {/* Features */}
-      <section id="features" style={{ padding: '100px 24px', maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 64 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#FF8A65', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: "'Quicksand', sans-serif" }}>Features</span>
-          <h2 style={{ fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 800, margin: '12px 0 16px', lineHeight: 1.15, letterSpacing: '-0.02em' }}>
-            <span style={{ background: 'linear-gradient(135deg, #FFFFFF, rgba(255,255,255,0.7))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Everything You Need to </span>
-            <span style={{ background: 'linear-gradient(135deg, #FF8A65, #FFB74D)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Read Better</span>
+      <section id="features" style={{ padding: '80px 20px', maxWidth: 1040, margin: '0 auto' }}>
+        <div style={{ textAlign: 'center', marginBottom: 56 }}>
+          <span style={{ fontSize: 12, fontWeight: 700, color: '#D97706', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Features</span>
+          <h2 style={{ fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 800, margin: '10px 0 12px', color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.15 }}>
+            Everything You Need to{' '}
+            <span style={{ color: '#D97706' }}>Read Better</span>
           </h2>
-          <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.45)', maxWidth: 480, margin: '0 auto', fontFamily: "'Quicksand', sans-serif", lineHeight: 1.6 }}>Powerful accessibility tools wrapped in a beautiful, distraction-free experience.</p>
+          <p style={{ fontSize: 16, color: '#78716C', maxWidth: 440, margin: '0 auto', lineHeight: 1.6 }}>Powerful accessibility tools in a clean, distraction-free experience.</p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 20 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
           {features.map((f, i) => (
-            <div key={i} className="landing-shimmer" style={{ padding: '32px 28px', borderRadius: 20, backgroundColor: '#141414', border: '1px solid rgba(255,255,255,0.06)', transition: 'border-color 0.3s, transform 0.3s', cursor: 'default' }}
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(255,138,101,0.3)'; e.currentTarget.style.transform = 'translateY(-4px)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; e.currentTarget.style.transform = 'translateY(0)'; }}>
-              <div style={{ fontSize: 32, marginBottom: 16 }}>{f.icon}</div>
-              <h3 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 10px', color: '#fff', fontFamily: "'Quicksand', sans-serif" }}>{f.title}</h3>
-              <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', lineHeight: 1.65, margin: 0, fontFamily: "'Quicksand', sans-serif" }}>{f.desc}</p>
+            <div key={i} style={{ padding: '28px 24px', borderRadius: 12, backgroundColor: '#FFFFFF', border: '1px solid #EEEDED', transition: 'border-color 150ms ease' }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#D97706'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#EEEDED'; }}>
+              <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#FFFBEB', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, color: '#D97706' }}>{f.icon}</div>
+              <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px', color: '#0F172A' }}>{f.title}</h3>
+              <p style={{ fontSize: 14, color: '#78716C', lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
       {/* How It Works */}
-      <section id="how" style={{ padding: '100px 24px', backgroundColor: '#111111', borderTop: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <span style={{ fontSize: 13, fontWeight: 700, color: '#4DB6AC', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: "'Quicksand', sans-serif" }}>How It Works</span>
-            <h2 style={{ fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 800, margin: '12px 0 0', lineHeight: 1.15, letterSpacing: '-0.02em', color: '#fff' }}>Three Steps to Accessible Reading</h2>
+      <section id="how" style={{ padding: '80px 20px', backgroundColor: '#FFFFFF', borderTop: '1px solid #EEEDED', borderBottom: '1px solid #EEEDED' }}>
+        <div style={{ maxWidth: 720, margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: 48 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#16A34A', textTransform: 'uppercase', letterSpacing: '0.1em' }}>How It Works</span>
+            <h2 style={{ fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 800, margin: '10px 0 0', color: '#0F172A', letterSpacing: '-0.02em' }}>Three Steps to Accessible Reading</h2>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {steps.map((s, i) => (
-              <div key={i} style={{ display: 'flex', gap: 28, alignItems: 'flex-start', padding: '32px', borderRadius: 20, backgroundColor: '#1A1A1A', border: '1px solid rgba(255,255,255,0.06)', transition: 'border-color 0.3s' }}
-                onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(77,182,172,0.3)'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; }}>
-                <div style={{ minWidth: 56, height: 56, borderRadius: 14, background: 'linear-gradient(135deg, rgba(255,138,101,0.15), rgba(77,182,172,0.15))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <span style={{ fontSize: 22, fontWeight: 800, background: 'linear-gradient(135deg, #FF8A65, #4DB6AC)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', fontFamily: "'Quicksand', sans-serif" }}>{s.num}</span>
+              <div key={i} style={{ display: 'flex', gap: 24, alignItems: 'flex-start', padding: '24px', borderRadius: 12, border: '1px solid #EEEDED', backgroundColor: '#FFFBEB', transition: 'border-color 150ms ease' }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#D97706'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#EEEDED'; }}>
+                <div style={{ minWidth: 44, height: 44, borderRadius: 8, backgroundColor: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <span style={{ fontSize: 16, fontWeight: 800, color: '#FFFFFF' }}>{s.num}</span>
                 </div>
                 <div>
-                  <h3 style={{ fontSize: 18, fontWeight: 700, margin: '0 0 8px', color: '#fff', fontFamily: "'Quicksand', sans-serif" }}>{s.title}</h3>
-                  <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.5)', lineHeight: 1.6, margin: 0, fontFamily: "'Quicksand', sans-serif" }}>{s.desc}</p>
+                  <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 4px', color: '#0F172A' }}>{s.title}</h3>
+                  <p style={{ fontSize: 14, color: '#78716C', lineHeight: 1.6, margin: 0 }}>{s.desc}</p>
                 </div>
               </div>
             ))}
@@ -1334,27 +1287,26 @@ function LandingView() {
       </section>
 
       {/* CTA */}
-      <section style={{ padding: '100px 24px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
-        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 500, height: 500, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,138,101,0.12) 0%, transparent 70%)', filter: 'blur(60px)', pointerEvents: 'none' }} />
-        <div style={{ position: 'relative', zIndex: 1 }}>
-          <h2 style={{ fontSize: 'clamp(28px, 4vw, 44px)', fontWeight: 800, margin: '0 0 16px', letterSpacing: '-0.02em' }}>
-            <span style={{ background: 'linear-gradient(135deg, #FFFFFF, rgba(255,255,255,0.7))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Start Reading </span>
-            <span style={{ background: 'linear-gradient(135deg, #FF8A65, #FFB74D)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Better Today</span>
+      <section style={{ padding: '80px 20px', textAlign: 'center' }}>
+        <div style={{ maxWidth: 520, margin: '0 auto' }}>
+          <h2 style={{ fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 800, margin: '0 0 12px', color: '#0F172A', letterSpacing: '-0.02em' }}>
+            Start Reading{' '}
+            <span style={{ color: '#D97706' }}>Better Today</span>
           </h2>
-          <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.45)', maxWidth: 440, margin: '0 auto 40px', fontFamily: "'Quicksand', sans-serif", lineHeight: 1.6 }}>No sign-up. No downloads. Just paste your text and experience the future of reading.</p>
-          <button onClick={goApp} className="landing-glow" style={{ background: 'linear-gradient(135deg, #FF8A65, #FF7043)', color: '#fff', border: 'none', padding: '18px 56px', borderRadius: 16, fontSize: 18, fontWeight: 700, cursor: 'pointer', fontFamily: "'Quicksand', sans-serif", transition: 'transform 0.2s', letterSpacing: '0.02em' }}
-            onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}>Try It Out \u2192</button>
+          <p style={{ fontSize: 16, color: '#78716C', maxWidth: 400, margin: '0 auto 36px', lineHeight: 1.6 }}>No sign-up. No downloads. Just paste your text and experience the future of reading.</p>
+          <button onClick={goApp} style={{ backgroundColor: '#D97706', color: '#FFFFFF', border: 'none', padding: '16px 56px', borderRadius: 8, fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'background-color 150ms ease', letterSpacing: '0.01em' }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#92400E'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#D97706'; }}>Try It Out</button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer style={{ padding: '40px 24px', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16, maxWidth: 1100, margin: '0 auto' }}>
+      <footer style={{ padding: '32px 20px', borderTop: '1px solid #EEEDED', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, maxWidth: 1040, margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 18 }}>📖</span>
-          <span style={{ fontFamily: "'Quicksand', sans-serif", fontWeight: 700, fontSize: 16, color: '#fff' }}>AccessiTale</span>
+          <BookOpen size={18} strokeWidth={2.2} color="#92400E" />
+          <span style={{ fontWeight: 800, fontSize: 15, color: '#0F172A' }}>AccessiTale</span>
         </div>
-        <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.3)', margin: 0, fontFamily: "'Quicksand', sans-serif" }}>Built for accessibility. Free forever.</p>
+        <p style={{ fontSize: 12, color: '#A8A29E', margin: 0 }}>Built for accessibility. Free forever.</p>
       </footer>
     </div>
   );
@@ -2104,7 +2056,7 @@ export default function App() {
         select { appearance: auto; }
       `}
       </style>
-      <div style={{ backgroundColor: view === 'landing' ? '#0A0A0A' : theme.bg, minHeight: '100vh' }}>
+      <div style={{ backgroundColor: theme.bg, minHeight: '100vh' }}>
         <ViewComponent />
         {view !== 'landing' && <SettingsPanel />}
       </div>
