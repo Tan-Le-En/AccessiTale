@@ -168,6 +168,31 @@ const EMOJI_MAP = {
   island: '🏝️', gold: '✨', treasure: '💰', door: '🚪', key: '🔑',
 };
 
+const ZH_EMOJI = {
+  '\u732B': '\uD83D\uDC31', '\u72D7': '\uD83D\uDC36', '\u592A\u9633': '\u2600\uFE0F',
+  '\u6708\u4EAE': '\uD83C\uDF19', '\u661F\u661F': '\u2B50', '\u6811': '\uD83C\uDF33',
+  '\u623F\u5B50': '\uD83C\uDFE0', '\u6C34': '\uD83D\uDCA7', '\u706B': '\uD83D\uDD25',
+  '\u9F99': '\uD83D\uDC09', '\u68EE\u6797': '\uD83C\uDF32', '\u6CB3\u6D41': '\uD83C\uDFDE\uFE0F',
+  '\u5C71': '\u26F0\uFE0F', '\u9E1F': '\uD83D\uDC26', '\u9C7C': '\uD83D\uDC1F',
+  '\u82B1': '\uD83C\uDF38', '\u96E8': '\uD83C\uDF27\uFE0F', '\u96EA': '\u2744\uFE0F',
+  '\u98CE': '\uD83D\uDCA8', '\u591C\u665A': '\uD83C\uDF03', '\u5F00\u5FC3': '\uD83D\uDE0A',
+  '\u4F24\u5FC3': '\uD83D\uDE22', '\u98DE': '\uD83E\uDD8B', '\u6E38\u6CF3': '\uD83C\uDFCA',
+  '\u7761\u89C9': '\uD83D\uDE34', '\u7231': '\u2764\uFE0F', '\u670B\u53CB': '\uD83E\uDD1D',
+  '\u5BB6\u5EAD': '\uD83D\uDC6A', '\u9B54\u6CD5': '\uD83E\uDE84', '\u57CE\u5821': '\uD83C\uDFF0',
+  '\u8239': '\uD83D\uDEA2', '\u5C0F\u8239': '\u26F5', '\u6C7D\u8F66': '\uD83D\uDE97',
+  '\u4E66': '\uD83D\uDCD6', '\u97F3\u4E50': '\uD83C\uDFB5', '\u821E\u8E48': '\uD83D\uDC83',
+  '\u5531\u6B4C': '\uD83C\uDFA4', '\u8D70\u8DEF': '\uD83D\uDEB6', '\u5927': '\uD83D\uDC18',
+  '\u5C0F': '\uD83D\uDC2D', '\u52C7\u6562': '\uD83E\uDD81', '\u718A': '\uD83D\uDC3B',
+  '\u5154\u5B50': '\uD83D\uDC30', '\u9E21\u86CB': '\uD83E\uDD5A', '\u82B9\u83DC': '\uD83C\uDF3F',
+  '\u5F69\u8679': '\uD83C\uDF08', '\u4E91': '\u2601\uFE0F', '\u6D77': '\uD83C\uDF0A',
+  '\u5B64\u5C9B': '\uD83C\uDFDD\uFE0F', '\u94A5\u5319': '\uD83D\uDD11', '\u95E8': '\uD83D\uDEAA',
+  '\u9E21': '\uD83D\uDC14', '\u9A6C': '\uD83D\uDC34', '\u725B': '\uD83D\uDC02',
+  '\u86C7': '\uD83D\uDC0D', '\u9F20': '\uD83D\uDC00', '\u867E': '\uD83E\uDD90',
+  '\u83DC': '\uD83E\uDD6C', '\u8611\u83C7': '\uD83C\uDF44', '\u5C0F\u9E21': '\uD83D\uDC24',
+  '\u8001\u864E': '\uD83D\uDC2F', '\u751F\u6D3B': '\uD83C\uDFE0', '\u81EA\u7531': '\uD83C\uDFF3\uFE0F',
+  '\u5E0C\u671B': '\uD83C\uDF1F', '\u52C7\u6C14': '\uD83E\uDDE1', '\u5149\u8292': '\uD83C\uDF1F',
+};
+
 /* =====================================================
    TEXT UTILITIES
 ===================================================== */
@@ -176,7 +201,7 @@ function splitSentences(text) {
   const trimmed = text.trim();
 
   const raw = [];
-  const sentenceRegex = /[^.!?…]+(?:[.!?…](?:\s|$|(?=[^.!?…])))+/g;
+  const sentenceRegex = /[^\u3002\uFF01\uFF1F.!?…]+(?:[\u3002\uFF01\uFF1F.!?…](?:\s|$|(?=[^\u3002\uFF01\uFF1F.!?…])))+/g;
   let match;
   while ((match = sentenceRegex.exec(trimmed)) !== null) {
     const piece = match[0].trim();
@@ -189,7 +214,7 @@ function splitSentences(text) {
 
   const result = [];
   raw.forEach((s) => {
-    const words = s.split(/\s+/).filter(Boolean);
+    const words = tokenizeText(s);
     if (words.length <= 30) {
       result.push(s);
     } else {
@@ -212,7 +237,7 @@ function splitSentences(text) {
 }
 
 function chunkSentenceWords(sentence, target = 9) {
-  const words = sentence.split(/\s+/).filter(Boolean);
+  const words = tokenizeText(sentence);
   if (words.length <= 10) return [sentence];
   const lines = [];
   let i = 0;
@@ -239,9 +264,32 @@ function chunkLinesWithSentenceIndex(text) {
 }
 
 function splitWordPunct(token) {
-  const m = token.match(/^([^a-zA-Z']*)([a-zA-Z']*)([^a-zA-Z']*)$/);
+  const m = token.match(/^([^a-zA-Z\u00C0-\u024F\u0400-\u04FF\u0600-\u06FF\u0E00-\u0E7F\u4E00-\u9FFF]*)([a-zA-Z\u00C0-\u024F\u0400-\u04FF\u0600-\u06FF\u0E00-\u0E7F\u4E00-\u9FFF]*)([^a-zA-Z\u00C0-\u024F\u0400-\u04FF\u0600-\u06FF\u0E00-\u0E7F\u4E00-\u9FFF]*)$/);
   if (!m) return { lead: '', core: token, trail: '' };
   return { lead: m[1], core: m[2], trail: m[3] };
+}
+
+function hasCJK(text) {
+  return /[\u3000-\u9FFF\uF900-\uFAFF]/.test(text);
+}
+
+function tokenizeText(text) {
+  if (!text) return [];
+  if (hasCJK(text)) {
+    const result = [];
+    let buf = '';
+    for (const ch of text) {
+      if (/[\u4E00-\u9FFF\u3000-\u303F\uFF00-\uFFEF]/.test(ch)) {
+        if (buf) { result.push(buf); buf = ''; }
+        result.push(ch);
+      } else {
+        buf += ch;
+      }
+    }
+    if (buf) result.push(buf);
+    return result.filter(Boolean);
+  }
+  return text.split(/\s+/).filter(Boolean);
 }
 
 function bionicBoldLength(core) {
@@ -266,6 +314,7 @@ function renderWord(token, key, settings, onWordClick) {
   if (settings.emojiVisualizer && core) {
     const lower = core.toLowerCase().replace(/'/g, '');
     if (EMOJI_MAP[lower]) emoji = EMOJI_MAP[lower];
+    if (!emoji && ZH_EMOJI[lower]) emoji = ZH_EMOJI[lower];
   }
 
   const wordNode = (onWordClick && core) ? (
@@ -297,11 +346,11 @@ function renderWord(token, key, settings, onWordClick) {
 
 function wordCount(text) {
   if (!text || !text.trim()) return 0;
-  return text.trim().split(/\s+/).filter(Boolean).length;
+  return tokenizeText(text.trim()).length;
 }
 
 function normalizeWord(w) {
-  return (w || '').toLowerCase().replace(/[^a-z0-9']/g, '');
+  return (w || '').toLowerCase().replace(/[^a-z0-9'\u4E00-\u9FFF\u3000-\u303F\uFF00-\uFFEF]/g, '');
 }
 
 function levenshtein(a, b) {
@@ -330,8 +379,8 @@ function wordsMatch(target, spoken) {
 }
 
 function scoreAttempt(targetSentence, spokenText) {
-  const targetWords = targetSentence.split(/\s+/).filter(Boolean);
-  const spokenWords = (spokenText || '').split(/\s+/).filter(Boolean);
+  const targetWords = tokenizeText(targetSentence);
+  const spokenWords = tokenizeText(spokenText || '');
   const results = targetWords.map((tw, i) => {
     let matched = false;
     for (let offset = -2; offset <= 2; offset++) {
@@ -981,7 +1030,7 @@ function StoryText({ content, settings, highlightIdx = -1, centered = false, tex
             transition: 'background-color 200ms ease-out',
             textAlign: textAlignOverride || (centered ? 'center' : 'left'),
           }}>
-            {l.text.split(/\s+/).filter(Boolean).map((w, wi) => renderWord(w, `${i}-${wi}`, settings, onWordClick))}
+            {tokenizeText(l.text).map((w, wi) => renderWord(w, `${i}-${wi}`, settings, onWordClick))}
           </div>
         );
       })}
@@ -1404,7 +1453,7 @@ function PracticeView() {
   const speedTimerRef = useRef(null);
 
   const target = sentences[index];
-  const targetWords = useMemo(() => target ? target.split(/\s+/).filter(Boolean) : [], [target]);
+  const targetWords = useMemo(() => target ? tokenizeText(target) : [], [target]);
   const isLast = index >= sentences.length - 1;
 
   useEffect(() => () => { if (speedTimerRef.current) clearInterval(speedTimerRef.current); }, []);
@@ -1730,7 +1779,7 @@ function SettingsPanel() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <span style={{ fontFamily: "'Quicksand', sans-serif", fontWeight: 600, fontSize: 17, color: theme.textPrimary }}>{t.narrationSpeed}</span>
             <Segmented ariaLabel={t.narrationSpeed} value={settings.narrationSpeed} onChange={(v) => setSettings((s) => ({ ...s, narrationSpeed: v }))}
-              options={[{ value: 0.75, label: '0.75x' }, { value: 1, label: '1x' }, { value: 1.25, label: '1.25x' }]} />
+              options={[{ value: 0.75, label: '0.75x' }, { value: 1, label: '1x' }, { value: 1.25, label: '1.25x' }, { value: 1.5, label: '1.5x' }]} />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
