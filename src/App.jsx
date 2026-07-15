@@ -1146,7 +1146,7 @@ function Header({ onNewStory }) {
    LANDING VIEW
 ===================================================== */
 function LandingView() {
-  const { setView, theme } = useApp();
+  const { setView, theme, stories } = useApp();
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -1209,6 +1209,11 @@ function LandingView() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 28 }}>
           <a href="#features" onClick={(e) => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: 14, fontWeight: 500, transition: 'color 0.2s', fontFamily: "'Quicksand', sans-serif" }}>Features</a>
           <a href="#how" onClick={(e) => { e.preventDefault(); document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: 14, fontWeight: 500, transition: 'color 0.2s', fontFamily: "'Quicksand', sans-serif" }}>How It Works</a>
+          {stories.length > 0 && (
+            <button onClick={goApp} style={{ background: 'transparent', color: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.15)', padding: '8px 20px', borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: "'Quicksand', sans-serif", transition: 'all 0.2s' }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'; e.currentTarget.style.color = '#fff'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'; e.currentTarget.style.color = 'rgba(255,255,255,0.6)'; }}>Continue to App</button>
+          )}
           <button onClick={goApp} style={{ background: 'linear-gradient(135deg, #FF8A65, #FF7043)', color: '#fff', border: 'none', padding: '10px 24px', borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: "'Quicksand', sans-serif", transition: 'transform 0.2s, box-shadow 0.2s', letterSpacing: '0.02em' }}
             onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.05)'; e.currentTarget.style.boxShadow = '0 4px 20px rgba(255,138,101,0.4)'; }}
             onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none'; }}>Try It Out</button>
@@ -2039,13 +2044,7 @@ function SettingsPanel() {
 export default function App() {
   const [stories, setStories] = useState(() => loadFromStorage('accessitale_stories', []));
   const [currentStoryId, setCurrentStoryId] = useState(null);
-  const [view, setView] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = loadFromStorage('accessitale_stories', []);
-      return saved.length > 0 ? 'library' : 'landing';
-    }
-    return 'landing';
-  });
+  const [view, setView] = useState('landing');
   const [settings, setSettings] = useState(() => loadFromStorage('accessitale_settings', DEFAULT_SETTINGS));
   const [language, setLanguage] = useState(() => loadFromStorage('accessitale_language', 'en'));
   const [showSettings, setShowSettings] = useState(false);
