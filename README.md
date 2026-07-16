@@ -1,25 +1,34 @@
 # AccessiTale
 
-A reading accessibility app that transforms stories into accessible formats with bionic reading, dyslexia-friendly fonts, text-to-speech narration, and multilingual dictionary support. Built with React, Vite, and Edge-TTS.
+A reading accessibility app that transforms stories into accessible formats with bionic reading, dyslexia-friendly fonts, text-to-speech narration, emoji visualization, and multilingual dictionary support. Built with React, Vite, and Edge-TTS.
+
+**Live:** [accessitale.vercel.app](https://accessitale.vercel.app)
 
 ## Features
+
+### Landing Page
+- World-class landing page with animated hero, interactive preview card, and feature showcase
+- Language tabs (EN/MS/ZH) with live bionic reading preview
+- Scroll-triggered reveal animations via IntersectionObserver
 
 ### Reading Accessibility
 - **Bionic Reading** -- Bold the first ~40% of each word to guide eye movement and speed up reading
 - **Dyslexia-Friendly Font** -- Increased line-height (1.9) and letter-spacing (0.06em) using Lexend
 - **Large Text** -- Four size options: S (16px), M (18px), L (22px), XL (26px)
 - **High Contrast Theme** -- Black background, white text, yellow accent (WCAG AAA)
-- **Emoji Visualizer** -- Appends emoji after matching words (e.g. "cat" becomes "cat 🐱")
+- **Emoji Visualizer** -- Appends emoji after matching words (e.g. "cat" becomes "cat 🐱"), with CJK character support
 
 ### Text-to-Speech Narration
-- **Neural Malay Voices** -- Microsoft Edge-TTS voices: Yasmin (female) and Osman (male)
-- **System TTS** -- Browser-native voices for English and Chinese via Web Speech API
-- **Adjustable Speed** -- 0.75x, 1x, or 1.25x playback
-- **Voice Picker** -- Choose from all available system voices grouped by language
+- **Edge-TTS Neural Voices** -- Microsoft neural voices for all three languages:
+  - English: Aria (female)
+  - Malay: Yasmin (female), Osman (male)
+  - Chinese: Xiaoxiao (female)
+- **Adjustable Speed** -- 0.75x, 1x, 1.25x, or 1.5x playback
 - **Sentence Highlighting** -- Narrated sentence is highlighted as it plays
+- **Pre-warm** -- TTS connection warmed on app mount for faster first narration
 
 ### Practice Modes
-- **Type & Check** -- Listen to a sentence, type it from memory, get scored with Levenshtein distance (25% tolerance). 1-3 stars awarded per sentence.
+- **Type & Check** -- Listen to a sentence, type it from memory, get scored with Levenshtein distance (25% tolerance). 1-3 stars awarded per sentence. CJK-aware tokenization for Chinese.
 - **Speed Read** -- Words highlight one-by-one at configurable WPM (80-400). Read along silently.
 
 ### Dictionary Lookup
@@ -27,6 +36,15 @@ Click any word in a story to see its definition:
 - **English** -- Local dictionary + online fallback via dictionaryapi.dev
 - **Malay** -- 150,000-entry Malay-to-English dictionary with curated common words
 - **Chinese** -- 81,000-character dictionary with pinyin, zhuyin, Cantonese, radical, and stroke count
+
+### Book Library
+- **60 books** across 3 languages (20 per language)
+  - **English** -- Alice in Wonderland, Pride and Prejudice, The Odyssey, Moby Dick, The Raven, and 15 more classics
+  - **Malay** -- Malin Kundang, Hang Tuah, Si Tanggang, Puteri Gunung Ledang, Hikayat Seri Rama, and 15 more folk tales and legends
+  - **Chinese** -- 论语, 西游记, 三国演义, 小王子, 花木兰, 白蛇传, and 14 more classics and folk tales
+- **Search** by title or author
+- **Language tabs** -- All / English / Bahasa Melayu / 中文
+- Separate from the main Library view (which holds user stories + 3 sample scripts)
 
 ### Multilingual Interface
 Full UI translation in three languages:
@@ -53,13 +71,16 @@ All stories, settings, and language preferences are saved to `localStorage` and 
 - **Quicksand** -- UI elements and navigation
 - **Poppins** -- Headings and titles
 - **Lexend** -- Story text (designed for reading accessibility)
+- **Plus Jakarta Sans** -- Landing page
 
 ## Project Structure
 
 ```
 AccessiTale/
 ├── src/
-│   ├── App.jsx              # Entire application (single file, ~1750 lines)
+│   ├── App.jsx              # Entire application (single file, ~2360 lines)
+│   ├── LIBRARY_BOOKS.js     # 40 books (20 English + 20 Malay)
+│   ├── CHINESE_BOOKS.js     # 20 Chinese books
 │   └── main.jsx             # React entry point
 ├── api/
 │   └── tts.py               # Vercel serverless function for Edge-TTS
@@ -154,7 +175,7 @@ Browser → POST /api/tts { text, voice, rate }
   ← Browser plays audio via Audio object
 ```
 
-When the UI language is set to Malay, narration automatically uses Edge-TTS neural voices. For other languages, it uses the browser's Web Speech API. Falls back to system TTS if the server is unavailable.
+Narration automatically selects the correct neural voice based on the story's language. Falls back to system TTS if the server is unavailable.
 
 ### Dictionary System
 
@@ -170,6 +191,10 @@ Built with `build-malay-dict.mjs`:
 - Auto-generates from a 200K English-Malay dataset (reversed to Malay-English)
 - Merges with ~345 curated common Malay words (hand-written, higher priority)
 - Uses scoring heuristics: common-word bonus, transliteration penalty, length penalty
+
+### CJK Text Handling
+
+Chinese and Japanese text is tokenized character-by-character (no word spacing), while English and Malay use space-based tokenization. This affects word count, bionic reading, emoji mapping, and practice scoring.
 
 ## Accessibility
 
