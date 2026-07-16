@@ -1099,7 +1099,7 @@ function TopBar() {
    HEADER (Library only)
 ===================================================== */
 function Header({ onNewStory }) {
-  const { theme, t, language, setLanguage, setShowSettings } = useApp();
+  const { theme, t, language, setLanguage, setShowSettings, setView } = useApp();
   const [langOpen, setLangOpen] = useState(false);
   const langRef = useRef(null);
 
