@@ -1146,9 +1146,85 @@ function Header({ onNewStory }) {
 /* =====================================================
    LANDING VIEW
 ===================================================== */
+
+const LANDING_PRESETS = [
+  {
+    lang: 'EN', label: 'English',
+    text: 'Once upon a time, there lived a brave little star who dreamed of dancing with the wolves.',
+    bionic: 'Once upon a time, there lived a brave little star \u2605 who dreamed of dancing \uD83D\uDC83 with the wolves.',
+    badges: ['Bionic', 'Emoji'],
+  },
+  {
+    lang: 'MS', label: 'Bahasa Melayu',
+    text: 'Pada suatu masa dahulu, terdapat sebuah bintang kecil yang berani yang bermimpi untuk menari bersama serigala.',
+    bionic: 'Pada suatu masa dahulu, terdapat sebuah bintang kecil yang berani yang bermimpi untuk menari bersama serigala.',
+    badges: ['Bionic', 'TTS'],
+  },
+  {
+    lang: '\u4E2D\u6587', label: '\u4E2D\u6587',
+    text: '\u5F88\u4E45\u5F88\u4E45\u4EE5\u524D\uFF0C\u5728\u9AD8\u9AD8\u7684\u591C\u7A7A\u4E0A\uFF0C\u4F4F\u7740\u4E00\u9897\u5C0F\u661F\u661F\u3002',
+    bionic: '\u5F88\u4E45\u5F88\u4E45\u4EE5\u524D\uFF0C\u5728\u9AD8\u9AD8\u7684\u591C\u7A7A\u4E0A\uFF0C\u4F4F\u7740\u4E00\u9897\u5C0F\u661F\u661F\u3002',
+    badges: ['Bionic', 'TTS'],
+  },
+];
+
+function ScrollReveal({ children, delay = 0 }) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setVisible(true); obs.disconnect(); } }, { threshold: 0.15 });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return (
+    <div ref={ref} style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(24px)', transition: `opacity 0.5s ${delay}ms ease-out, transform 0.5s ${delay}ms ease-out` }}>
+      {children}
+    </div>
+  );
+}
+
+function BionicWord({ word, visible }) {
+  if (!visible) return <span style={{ opacity: 0 }}>{word} </span>;
+  const boldLen = Math.max(1, Math.ceil(word.length * 0.45));
+  return <span><span style={{ fontWeight: 800 }}>{word.slice(0, boldLen)}</span>{word.slice(boldLen)} </span>;
+}
+
+function AnimatedPreview({ preset, active }) {
+  const [shown, setShown] = useState(0);
+  useEffect(() => {
+    if (!active) { setShown(0); return; }
+    setShown(0);
+    const words = preset.text.split(' ');
+    let i = 0;
+    const iv = setInterval(() => {
+      i++;
+      setShown(i);
+      if (i >= words.length) clearInterval(iv);
+    }, 180);
+    return () => clearInterval(iv);
+  }, [active, preset]);
+
+  const words = preset.text.split(' ');
+
+  return (
+    <div style={{ fontFamily: "'Lexend', monospace", fontSize: 'clamp(15px, 2.2vw, 20px)', lineHeight: 1.9, color: '#0F172A', minHeight: 72 }}>
+      {words.map((w, i) => (
+        <BionicWord key={`${preset.lang}-${i}`} word={w} visible={i < shown} />
+      ))}
+      {shown >= words.length && (
+        <span style={{ display: 'inline-block', width: 2, height: '1.1em', backgroundColor: '#D97706', verticalAlign: 'text-bottom', marginLeft: 2, animation: 'landing-blink 1s step-end infinite' }} />
+      )}
+    </div>
+  );
+}
+
 function LandingView() {
   const { setView } = useApp();
   const [scrolled, setScrolled] = useState(false);
+  const [activeLang, setActiveLang] = useState(0);
+  const [demoMode, setDemoMode] = useState('bionic');
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -1159,12 +1235,12 @@ function LandingView() {
   const goApp = () => setView('library');
 
   const features = [
-    { icon: <Type size={24} strokeWidth={2} />, title: 'Bionic Reading', desc: 'Bold the first few letters of every word so your eyes glide through text effortlessly.' },
-    { icon: <Smile size={24} strokeWidth={2} />, title: 'Emoji Visualizer', desc: 'Words come alive with auto-mapped emojis, turning reading into visual storytelling.' },
-    { icon: <Languages size={24} strokeWidth={2} />, title: '3 Languages', desc: 'Full support for English, Malay, and Chinese with native neural TTS voices.' },
-    { icon: <Headphones size={24} strokeWidth={2} />, title: 'Listen & Repeat', desc: 'Hear sentences read aloud, then record yourself. AI scores your pronunciation.' },
-    { icon: <Eye size={24} strokeWidth={2} />, title: 'Focus Mode', desc: 'Distraction-free reading with sentence-by-sentence highlighting and narration.' },
-    { icon: <PenTool size={24} strokeWidth={2} />, title: 'Type & Check', desc: 'Type what you heard and get instant feedback on accuracy with highlighted corrections.' },
+    { icon: <Type size={22} strokeWidth={2} />, title: 'Bionic Reading', desc: 'Bold the first few letters of every word so your eyes glide through text.', demo: 'bionic' },
+    { icon: <Smile size={22} strokeWidth={2} />, title: 'Emoji Visualizer', desc: 'Words come alive with auto-mapped emojis, turning reading into visual storytelling.', demo: 'emoji' },
+    { icon: <Languages size={22} strokeWidth={2} />, title: '3 Languages', desc: 'Full support for English, Malay, and Chinese with native neural TTS voices.', demo: 'lang' },
+    { icon: <Headphones size={22} strokeWidth={2} />, title: 'Listen & Repeat', desc: 'Hear sentences read aloud, then record yourself. AI scores your pronunciation.', demo: 'listen' },
+    { icon: <Eye size={22} strokeWidth={2} />, title: 'Focus Mode', desc: 'Distraction-free reading with sentence-by-sentence highlighting and narration.', demo: 'focus' },
+    { icon: <PenTool size={22} strokeWidth={2} />, title: 'Type & Check', desc: 'Type what you heard and get instant feedback on accuracy with corrections.', demo: 'type' },
   ];
 
   const steps = [
@@ -1173,11 +1249,20 @@ function LandingView() {
     { num: '03', title: 'Read, listen, practice', desc: 'Enjoy focus mode, listen to natural voices, or practice pronunciation.' },
   ];
 
+  const demoTexts = {
+    bionic: { label: 'Bionic Reading', render: (w, i) => { const b = Math.max(1, Math.ceil(w.length * 0.45)); return <span key={i}><span style={{ fontWeight: 800 }}>{w.slice(0, b)}</span>{w.slice(b)} </span>; } },
+    emoji: { label: 'Emoji Visualizer', render: (w, i) => { const em = { star: '\u2605', danced: '\uD83D\uDC83', wolves: '\uD83D\uDC3A', little: '\uD83D\uDC76', brave: '\uD83E\uDD81' }; const e = em[w.toLowerCase()]; return <span key={i}>{e ? `${e} ` : ''}{w} </span>; } },
+  };
+
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#FFFBEB', fontFamily: "'Plus Jakarta Sans', 'Quicksand', sans-serif", overflowX: 'hidden' }}>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
       <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+      <style>{`
+        @keyframes landing-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+        @keyframes landing-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+      `}</style>
 
       {/* Nav */}
       <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100, padding: '0 clamp(20px, 4vw, 48px)', height: 64, display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: scrolled ? 'rgba(255,251,235,0.95)' : 'transparent', backdropFilter: scrolled ? 'blur(8px)' : 'none', borderBottom: scrolled ? '1px solid #EEEDED' : '1px solid transparent', transition: 'background-color 200ms ease, border-color 200ms ease, backdrop-filter 200ms ease' }}>
@@ -1188,7 +1273,7 @@ function LandingView() {
         <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
           <a href="#features" onClick={(e) => { e.preventDefault(); document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#78716C', textDecoration: 'none', fontSize: 14, fontWeight: 500, transition: 'color 150ms ease' }}>Features</a>
           <a href="#how" onClick={(e) => { e.preventDefault(); document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#78716C', textDecoration: 'none', fontSize: 14, fontWeight: 500, transition: 'color 150ms ease' }}>How It Works</a>
-          <button onClick={goApp} style={{ backgroundColor: '#D97706', color: '#FFFFFF', border: 'none', padding: '10px 24px', borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'background-color 150ms ease, opacity 150ms ease', letterSpacing: '0.01em' }}
+          <button onClick={goApp} style={{ backgroundColor: '#D97706', color: '#FFFFFF', border: 'none', padding: '10px 24px', borderRadius: 8, fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'background-color 150ms ease', letterSpacing: '0.01em' }}
             onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#92400E'; }}
             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#D97706'; }}>Try It Out</button>
         </div>
@@ -1218,45 +1303,106 @@ function LandingView() {
             onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#D97706'; }}>Try It Out</button>
         </div>
 
-        {/* Preview Card */}
-        <div style={{ position: 'relative', zIndex: 1, marginTop: 56, width: '100%', maxWidth: 640, padding: '0 20px' }}>
-          <div style={{ backgroundColor: '#FFFFFF', borderRadius: 12, padding: '28px 32px', border: '1px solid #EEEDED' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 20 }}>
-              <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#F87171' }} />
-              <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#FBBF24' }} />
-              <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#34D399' }} />
+        {/* Interactive Preview Card */}
+        <div style={{ position: 'relative', zIndex: 1, marginTop: 56, width: '100%', maxWidth: 660, padding: '0 20px' }}>
+          <div style={{ backgroundColor: '#FFFFFF', borderRadius: 12, border: '1px solid #EEEDED', overflow: 'hidden' }}>
+            {/* Window chrome */}
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 20px', borderBottom: '1px solid #EEEDED', backgroundColor: '#FAFAF9' }}>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#F87171' }} />
+                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#FBBF24' }} />
+                <div style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#34D399' }} />
+              </div>
+              {/* Language tabs */}
+              <div style={{ display: 'flex', gap: 4 }}>
+                {LANDING_PRESETS.map((p, i) => (
+                  <button key={p.lang} onClick={() => setActiveLang(i)}
+                    style={{ padding: '4px 12px', borderRadius: 6, border: 'none', fontSize: 12, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 150ms ease', backgroundColor: activeLang === i ? '#D97706' : 'transparent', color: activeLang === i ? '#FFFFFF' : '#78716C' }}>
+                    {p.lang}
+                  </button>
+                ))}
+              </div>
             </div>
-            <div style={{ fontFamily: "'Lexend', monospace", fontSize: 'clamp(15px, 2.2vw, 20px)', lineHeight: 1.8, color: '#0F172A' }}>
-              <span style={{ fontWeight: 800 }}>O</span>nce <span style={{ fontWeight: 800 }}>up</span>on <span style={{ fontWeight: 800 }}>a</span> <span style={{ fontWeight: 800 }}>tim</span>e, <span style={{ fontWeight: 800 }}>the</span>re <span style={{ fontWeight: 800 }}>liv</span>ed <span style={{ fontWeight: 800 }}>a</span> <span style={{ fontWeight: 800 }}>brav</span>e <span style={{ fontWeight: 800 }}>litt</span>le <span style={{ fontWeight: 800 }}>st</span>ar <Star size={16} strokeWidth={2.5} color="#D97706" style={{ display: 'inline', verticalAlign: 'middle' }} /> <span style={{ fontWeight: 800 }}>wh</span>o <span style={{ fontWeight: 800 }}>dre</span>amt <span style={{ fontWeight: 800 }}>o</span>f <span style={{ fontWeight: 800 }}>dan</span>cing <Smile size={16} strokeWidth={2.5} color="#D97706" style={{ display: 'inline', verticalAlign: 'middle' }} /> <span style={{ fontWeight: 800 }}>wit</span>h <span style={{ fontWeight: 800 }}>the</span> <span style={{ fontWeight: 800 }}>wol</span>ves
-            </div>
-            <div style={{ display: 'flex', gap: 8, marginTop: 20, flexWrap: 'wrap' }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', borderRadius: 6, backgroundColor: '#FFFBEB', border: '1px solid #FDE68A', fontSize: 12, fontWeight: 600, color: '#92400E' }}><Type size={13} strokeWidth={2.5} /> Bionic</span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', borderRadius: 6, backgroundColor: '#FFFBEB', border: '1px solid #FDE68A', fontSize: 12, fontWeight: 600, color: '#92400E' }}><Smile size={13} strokeWidth={2.5} /> Emoji</span>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 12px', borderRadius: 6, backgroundColor: '#FFFBEB', border: '1px solid #FDE68A', fontSize: 12, fontWeight: 600, color: '#92400E' }}><Globe size={13} strokeWidth={2.5} /> EN</span>
+
+            {/* Content */}
+            <div style={{ padding: '24px 28px' }}>
+              <AnimatedPreview preset={LANDING_PRESETS[activeLang]} active={true} />
+
+              {/* Badges */}
+              <div style={{ display: 'flex', gap: 8, marginTop: 16, flexWrap: 'wrap' }}>
+                {LANDING_PRESETS[activeLang].badges.map((b) => (
+                  <span key={b} style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 5, backgroundColor: '#FFFBEB', border: '1px solid #FDE68A', fontSize: 11, fontWeight: 600, color: '#92400E' }}>
+                    {b === 'Bionic' && <Type size={12} strokeWidth={2.5} />}
+                    {b === 'Emoji' && <Smile size={12} strokeWidth={2.5} />}
+                    {b === 'TTS' && <Headphones size={12} strokeWidth={2.5} />}
+                    {b}
+                  </span>
+                ))}
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 5, backgroundColor: '#FFFBEB', border: '1px solid #FDE68A', fontSize: 11, fontWeight: 600, color: '#92400E' }}>
+                  <Globe size={12} strokeWidth={2.5} /> {LANDING_PRESETS[activeLang].lang}
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Live Demo Section */}
+      <section style={{ padding: '60px 20px', backgroundColor: '#FFFFFF', borderTop: '1px solid #EEEDED', borderBottom: '1px solid #EEEDED' }}>
+        <div style={{ maxWidth: 680, margin: '0 auto' }}>
+          <ScrollReveal>
+            <div style={{ textAlign: 'center', marginBottom: 36 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#D97706', textTransform: 'uppercase', letterSpacing: '0.1em' }}>See It In Action</span>
+              <h2 style={{ fontSize: 'clamp(22px, 3.5vw, 32px)', fontWeight: 800, margin: '8px 0 0', color: '#0F172A', letterSpacing: '-0.02em' }}>Toggle between reading modes</h2>
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal delay={100}>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginBottom: 24, flexWrap: 'wrap' }}>
+              {Object.entries(demoTexts).map(([key, val]) => (
+                <button key={key} onClick={() => setDemoMode(key)}
+                  style={{ padding: '8px 20px', borderRadius: 8, border: `1px solid ${demoMode === key ? '#D97706' : '#EEEDED'}`, backgroundColor: demoMode === key ? '#FFFBEB' : '#FFFFFF', color: demoMode === key ? '#92400E' : '#78716C', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: 'inherit', transition: 'all 150ms ease' }}>
+                  {val.label}
+                </button>
+              ))}
+            </div>
+          </ScrollReveal>
+
+          <ScrollReveal delay={200}>
+            <div style={{ backgroundColor: '#FFFBEB', borderRadius: 12, padding: '32px', border: '1px solid #EEEDED' }}>
+              <div style={{ fontFamily: "'Lexend', monospace", fontSize: 'clamp(18px, 3vw, 28px)', lineHeight: 2, color: '#0F172A' }}>
+                {'Once upon a time, there lived a brave little star who dreamed of dancing with the wolves.'.split(' ').map((w, i) => (
+                  <span key={i}>{demoTexts[demoMode].render(w, i)}</span>
+                ))}
+              </div>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
       {/* Features */}
       <section id="features" style={{ padding: '80px 20px', maxWidth: 1040, margin: '0 auto' }}>
-        <div style={{ textAlign: 'center', marginBottom: 56 }}>
-          <span style={{ fontSize: 12, fontWeight: 700, color: '#D97706', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Features</span>
-          <h2 style={{ fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 800, margin: '10px 0 12px', color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.15 }}>
-            Everything You Need to{' '}
-            <span style={{ color: '#D97706' }}>Read Better</span>
-          </h2>
-          <p style={{ fontSize: 16, color: '#78716C', maxWidth: 440, margin: '0 auto', lineHeight: 1.6 }}>Powerful accessibility tools in a clean, distraction-free experience.</p>
-        </div>
+        <ScrollReveal>
+          <div style={{ textAlign: 'center', marginBottom: 56 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: '#D97706', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Features</span>
+            <h2 style={{ fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 800, margin: '10px 0 12px', color: '#0F172A', letterSpacing: '-0.02em', lineHeight: 1.15 }}>
+              Everything You Need to{' '}
+              <span style={{ color: '#D97706' }}>Read Better</span>
+            </h2>
+            <p style={{ fontSize: 16, color: '#78716C', maxWidth: 440, margin: '0 auto', lineHeight: 1.6 }}>Powerful accessibility tools in a clean, distraction-free experience.</p>
+          </div>
+        </ScrollReveal>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
           {features.map((f, i) => (
-            <div key={i} style={{ padding: '28px 24px', borderRadius: 12, backgroundColor: '#FFFFFF', border: '1px solid #EEEDED', transition: 'border-color 150ms ease' }}
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#D97706'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#EEEDED'; }}>
-              <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#FFFBEB', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, color: '#D97706' }}>{f.icon}</div>
-              <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px', color: '#0F172A' }}>{f.title}</h3>
-              <p style={{ fontSize: 14, color: '#78716C', lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
-            </div>
+            <ScrollReveal key={i} delay={i * 60}>
+              <div style={{ padding: '28px 24px', borderRadius: 12, backgroundColor: '#FFFFFF', border: '1px solid #EEEDED', transition: 'border-color 150ms ease, transform 150ms ease', cursor: 'default' }}
+                onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#D97706'; e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#EEEDED'; e.currentTarget.style.transform = 'translateY(0)'; }}>
+                <div style={{ width: 40, height: 40, borderRadius: 8, backgroundColor: '#FFFBEB', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, color: '#D97706' }}>{f.icon}</div>
+                <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 8px', color: '#0F172A' }}>{f.title}</h3>
+                <p style={{ fontSize: 14, color: '#78716C', lineHeight: 1.6, margin: 0 }}>{f.desc}</p>
+              </div>
+            </ScrollReveal>
           ))}
         </div>
       </section>
@@ -1264,23 +1410,27 @@ function LandingView() {
       {/* How It Works */}
       <section id="how" style={{ padding: '80px 20px', backgroundColor: '#FFFFFF', borderTop: '1px solid #EEEDED', borderBottom: '1px solid #EEEDED' }}>
         <div style={{ maxWidth: 720, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <span style={{ fontSize: 12, fontWeight: 700, color: '#16A34A', textTransform: 'uppercase', letterSpacing: '0.1em' }}>How It Works</span>
-            <h2 style={{ fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 800, margin: '10px 0 0', color: '#0F172A', letterSpacing: '-0.02em' }}>Three Steps to Accessible Reading</h2>
-          </div>
+          <ScrollReveal>
+            <div style={{ textAlign: 'center', marginBottom: 48 }}>
+              <span style={{ fontSize: 12, fontWeight: 700, color: '#16A34A', textTransform: 'uppercase', letterSpacing: '0.1em' }}>How It Works</span>
+              <h2 style={{ fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 800, margin: '10px 0 0', color: '#0F172A', letterSpacing: '-0.02em' }}>Three Steps to Accessible Reading</h2>
+            </div>
+          </ScrollReveal>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {steps.map((s, i) => (
-              <div key={i} style={{ display: 'flex', gap: 24, alignItems: 'flex-start', padding: '24px', borderRadius: 12, border: '1px solid #EEEDED', backgroundColor: '#FFFBEB', transition: 'border-color 150ms ease' }}
-                onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#D97706'; }}
-                onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#EEEDED'; }}>
-                <div style={{ minWidth: 44, height: 44, borderRadius: 8, backgroundColor: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <span style={{ fontSize: 16, fontWeight: 800, color: '#FFFFFF' }}>{s.num}</span>
+              <ScrollReveal key={i} delay={i * 80}>
+                <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start', padding: '24px', borderRadius: 12, border: '1px solid #EEEDED', backgroundColor: '#FFFBEB', transition: 'border-color 150ms ease' }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#D97706'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#EEEDED'; }}>
+                  <div style={{ minWidth: 44, height: 44, borderRadius: 8, backgroundColor: '#D97706', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                    <span style={{ fontSize: 16, fontWeight: 800, color: '#FFFFFF' }}>{s.num}</span>
+                  </div>
+                  <div>
+                    <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 4px', color: '#0F172A' }}>{s.title}</h3>
+                    <p style={{ fontSize: 14, color: '#78716C', lineHeight: 1.6, margin: 0 }}>{s.desc}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 style={{ fontSize: 16, fontWeight: 700, margin: '0 0 4px', color: '#0F172A' }}>{s.title}</h3>
-                  <p style={{ fontSize: 14, color: '#78716C', lineHeight: 1.6, margin: 0 }}>{s.desc}</p>
-                </div>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -1288,16 +1438,18 @@ function LandingView() {
 
       {/* CTA */}
       <section style={{ padding: '80px 20px', textAlign: 'center' }}>
-        <div style={{ maxWidth: 520, margin: '0 auto' }}>
-          <h2 style={{ fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 800, margin: '0 0 12px', color: '#0F172A', letterSpacing: '-0.02em' }}>
-            Start Reading{' '}
-            <span style={{ color: '#D97706' }}>Better Today</span>
-          </h2>
-          <p style={{ fontSize: 16, color: '#78716C', maxWidth: 400, margin: '0 auto 36px', lineHeight: 1.6 }}>No sign-up. No downloads. Just paste your text and experience the future of reading.</p>
-          <button onClick={goApp} style={{ backgroundColor: '#D97706', color: '#FFFFFF', border: 'none', padding: '16px 56px', borderRadius: 8, fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'background-color 150ms ease', letterSpacing: '0.01em' }}
-            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#92400E'; }}
-            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#D97706'; }}>Try It Out</button>
-        </div>
+        <ScrollReveal>
+          <div style={{ maxWidth: 520, margin: '0 auto' }}>
+            <h2 style={{ fontSize: 'clamp(26px, 4vw, 40px)', fontWeight: 800, margin: '0 0 12px', color: '#0F172A', letterSpacing: '-0.02em' }}>
+              Start Reading{' '}
+              <span style={{ color: '#D97706' }}>Better Today</span>
+            </h2>
+            <p style={{ fontSize: 16, color: '#78716C', maxWidth: 400, margin: '0 auto 36px', lineHeight: 1.6 }}>No sign-up. No downloads. Just paste your text and experience the future of reading.</p>
+            <button onClick={goApp} style={{ backgroundColor: '#D97706', color: '#FFFFFF', border: 'none', padding: '16px 56px', borderRadius: 8, fontSize: 16, fontWeight: 700, cursor: 'pointer', fontFamily: 'inherit', transition: 'background-color 150ms ease', letterSpacing: '0.01em' }}
+              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#92400E'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#D97706'; }}>Try It Out</button>
+          </div>
+        </ScrollReveal>
       </section>
 
       {/* Footer */}
