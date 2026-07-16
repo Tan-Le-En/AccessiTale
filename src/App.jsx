@@ -6,8 +6,10 @@ import {
   Volume2, X, Check, RotateCcw, ArrowRight, Sparkles, Maximize2, Star,
   Zap, Type, ZoomIn, Smile, BookOpen, Keyboard, SkipForward, ChevronLeft,
   Timer, Eye, ChevronRight, Headphones, Languages, Target, PenTool,
-  BookMarked, Volume, Ear, FileText,
+  BookMarked, Volume, Ear, FileText, Library as LibraryIcon, Filter,
 } from 'lucide-react';
+import { LIBRARY_BOOKS } from './LIBRARY_BOOKS';
+import { CHINESE_BOOKS } from './CHINESE_BOOKS';
 
 /* =====================================================
    THEME
@@ -1040,31 +1042,29 @@ function StoryText({ content, settings, highlightIdx = -1, centered = false, tex
 }
 
 /* =====================================================
-   SAMPLE SCRIPTS
+   BOOK LIBRARY — Samples + 60 books (20 per language)
 ===================================================== */
 const SAMPLE_SCRIPTS = [
   {
     id: 'sample-en',
     title: 'The Little Star',
     content: 'Once upon a time, high up in the night sky, there lived a little star. Every evening, she would shine the brightest among all her brothers and sisters. One cloudy night, a young boy looked up and whispered, "I wish I could be brave like you." The little star twinkled with joy, knowing that even the smallest light can guide someone through the darkness.',
-    lang: 'en', flag: '🇬🇧',
-    labelEn: 'English Sample', labelMs: 'Contoh Bahasa Inggeris', labelZh: '英文示例',
+    lang: 'en', author: 'Original', genre: 'Fairy Tale',
   },
   {
     id: 'sample-ms',
     title: 'Bintang Kecil',
     content: 'Pada suatu masa dahulu, jauh di atas langit malam, ada seekor bintang kecil. Setiap petang, dia akan bersinar paling terang di antara semua adik-beradiknya. Pada suatu malam yang berawan, seorang budak lelaki melihat ke atas dan berbisik, "Saya ingin menjadi seberani awak." Bintang kecil itu berkelip-kelip dengan gembira, kerana mengetahui bahawa walaupun cahaya yang paling kecil boleh membimbing seseorang melalui kegelapan.',
-    lang: 'ms', flag: '🇲🇾',
-    labelEn: 'Malay Sample', labelMs: 'Contoh Bahasa Melayu', labelZh: '马来文示例',
+    lang: 'ms', author: 'Original', genre: 'Fairy Tale',
   },
   {
     id: 'sample-zh',
     title: '\u5C0F\u661F\u661F\u7684\u6545\u4E8B',
     content: '\u5F88\u4E45\u5F88\u4E45\u4EE5\u524D\uFF0C\u5728\u9AD8\u9AD8\u7684\u591C\u7A7A\u4E0A\uFF0C\u4F4F\u7740\u4E00\u9897\u5C0F\u661F\u661F\u3002\u6BCF\u5929\u665A\u4E0A\uFF0C\u5979\u90FD\u4F1A\u5728\u6240\u6709\u5144\u5F1F\u59B0\u59B0\u4E2D\u53D1\u51FA\u6700\u4EAE\u7684\u5149\u8292\u3002\u4E00\u5929\u665A\u4E0A\uFF0C\u4E00\u4E2A\u5C0F\u7537\u5B69\u62AC\u5934\u770B\u7740\u5929\u7A7A\uFF0C\u8F7B\u58F0\u8BF4\u9053\uFF1A\u201C\u6211\u5E0C\u671B\u6211\u80FD\u50CF\u4F60\u4E00\u6837\u52C7\u6562\u3002\u201D\u5C0F\u661F\u661F\u5F00\u5FC3\u5730\u95EA\u70C1\u7740\uFF0C\u56E0\u4E3A\u5979\u77E5\u9053\u5373\u4F7F\u662F\u6700\u5FAE\u5C0F\u7684\u5149\u8292\uFF0C\u4E5F\u80FD\u5728\u9ED1\u6697\u4E2D\u4E3A\u67D0\u4E2A\u4EBA\u6307\u5F15\u65B9\u5411\u3002',
-    lang: 'zh', flag: '🇨🇳',
-    labelEn: 'Chinese Sample', labelMs: 'Contoh Bahasa Cina', labelZh: '中文示例',
+    lang: 'zh', author: 'Original', genre: 'Fairy Tale',
   },
 ];
+const ALL_BOOKS = [...SAMPLE_SCRIPTS, ...LIBRARY_BOOKS, ...CHINESE_BOOKS];
 
 /* =====================================================
    TOP BAR (Global — all pages)
@@ -1476,6 +1476,7 @@ function coverFor(id) {
 
 function LibraryView() {
   const { theme, t, language, stories, setStories, setView, setCurrentStoryId } = useApp();
+  const [libFilter, setLibFilter] = useState('all');
 
   const handleNewStory = () => {
     const id = `story-${Date.now()}`;
@@ -1494,13 +1495,21 @@ function LibraryView() {
     setStories((prev) => prev.filter((s) => s.id !== id));
   };
 
-  const loadSample = (sample) => {
+  const loadBook = (book) => {
     const id = `story-${Date.now()}`;
-    const labelKey = language === 'ms' ? 'labelMs' : language === 'zh' ? 'labelZh' : 'labelEn';
-    setStories((prev) => [{ id, title: sample.title, content: sample.content, accessible: true, createdAt: Date.now() }, ...prev]);
+    setStories((prev) => [{ id, title: book.title, content: book.content, accessible: true, createdAt: Date.now() }, ...prev]);
     setCurrentStoryId(id);
     setView('read');
   };
+
+  const filteredBooks = libFilter === 'all' ? ALL_BOOKS : ALL_BOOKS.filter((b) => b.lang === libFilter);
+  const langFlag = (l) => l === 'en' ? '\uD83C\uDDEC\uD83C\uDDE7' : l === 'ms' ? '\uD83C\uDDF2\uD83C\uDDFE' : '\uD83C\uDDE8\uD83C\uDDF3';
+  const langTabs = [
+    { key: 'all', label: t.language || 'All' },
+    { key: 'en', label: 'English' },
+    { key: 'ms', label: 'Bahasa Melayu' },
+    { key: 'zh', label: '\u4E2D\u6587' },
+  ];
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: theme.bg }}>
@@ -1511,50 +1520,79 @@ function LibraryView() {
             <Plus size={20} aria-hidden="true" /> {t.newStory.replace('+ ', '')}
           </Button>
         </div>
-        <div style={{ marginBottom: 28 }}>
-          <p style={{ fontFamily: "'Quicksand', sans-serif", fontSize: 14, fontWeight: 600, color: theme.textSecondary, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t.trySample}</p>
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            {SAMPLE_SCRIPTS.map((sample) => (
-              <button key={sample.id} type="button" onClick={() => loadSample(sample)}
-                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', borderRadius: 14, border: `2px solid ${withAlpha(theme.accent, 0.3)}`, backgroundColor: withAlpha(theme.accent, 0.08), cursor: 'pointer', fontFamily: "'Quicksand', sans-serif", fontWeight: 600, fontSize: 15, color: theme.textPrimary, transition: 'background-color 180ms ease-out, border-color 180ms ease-out', minHeight: 44 }}
-                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = withAlpha(theme.accent, 0.18); e.currentTarget.style.borderColor = theme.accent; }}
-                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = withAlpha(theme.accent, 0.08); e.currentTarget.style.borderColor = withAlpha(theme.accent, 0.3); }}>
-                <span aria-hidden="true" style={{ fontSize: 18 }}>{sample.flag}</span>
-                <span>{sample.title}</span>
-              </button>
-            ))}
-          </div>
+
+        {/* Language filter tabs */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+          {langTabs.map((tab) => (
+            <button key={tab.key} type="button" onClick={() => setLibFilter(tab.key)}
+              style={{ padding: '8px 18px', borderRadius: 999, border: 'none', cursor: 'pointer', fontFamily: "'Quicksand', sans-serif", fontWeight: 700, fontSize: 14, transition: 'all 180ms ease-out', minHeight: 36,
+                backgroundColor: libFilter === tab.key ? theme.accent : withAlpha(theme.accent, 0.08),
+                color: libFilter === tab.key ? '#fff' : theme.textPrimary,
+              }}>
+              {tab.label}
+            </button>
+          ))}
         </div>
-        {stories.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '64px 16px' }}>
-            <div style={{ fontSize: 64, marginBottom: 16 }} aria-hidden="true">📚</div>
-            <p style={{ fontFamily: "'Quicksand', sans-serif", fontSize: 20, fontWeight: 600, color: theme.textPrimary, marginBottom: 24 }}>{t.emptyTitle}</p>
-            <Button variant="primary" onClick={handleNewStory}>
-              <Sparkles size={18} aria-hidden="true" /> {t.emptyCta}
-            </Button>
-          </div>
-        ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 20 }}>
-            {stories.map((s) => (
-              <Card key={s.id} onClick={() => openStory(s)} style={{ display: 'flex', flexDirection: 'column', gap: 10, position: 'relative' }}>
-                <div style={{ fontSize: 48 }} aria-hidden="true">{coverFor(s.id)}</div>
-                <div style={{ fontFamily: "'Quicksand', sans-serif", fontWeight: 700, fontSize: 18, color: theme.textPrimary }}>
-                  {s.title || t.untitled}
-                </div>
-                {s.accessible && (
-                  <span style={{ display: 'inline-block', alignSelf: 'flex-start', padding: '4px 12px', borderRadius: 999, backgroundColor: withAlpha(theme.secondary, 0.18), color: theme.secondary, fontFamily: "'Quicksand', sans-serif", fontWeight: 700, fontSize: 13 }}>
-                    {t.bionicReady}
-                  </span>
-                )}
-                <button
-                  type="button" aria-label="Delete story"
-                  onClick={(e) => deleteStory(e, s.id)}
-                  style={{ position: 'absolute', top: 8, right: 8, background: 'none', border: 'none', cursor: 'pointer', color: theme.textSecondary, padding: 4, borderRadius: 8 }}
-                >
-                  <X size={16} />
-                </button>
-              </Card>
-            ))}
+
+        {/* Book count */}
+        <p style={{ fontFamily: "'Quicksand', sans-serif", fontSize: 13, fontWeight: 600, color: theme.textSecondary, marginBottom: 16 }}>
+          {filteredBooks.length} {filteredBooks.length === 1 ? 'book' : 'books'}
+        </p>
+
+        {/* Book grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16, marginBottom: 40 }}>
+          {filteredBooks.map((book) => (
+            <button key={book.id} type="button" onClick={() => loadBook(book)}
+              style={{ textAlign: 'left', padding: 16, borderRadius: 14, border: `1.5px solid ${withAlpha(theme.accent, 0.15)}`, backgroundColor: theme.panel, cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 8, transition: 'border-color 180ms ease-out, box-shadow 180ms ease-out', minHeight: 44 }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = theme.accent; e.currentTarget.style.boxShadow = `0 2px 12px ${withAlpha(theme.accent, 0.12)}`; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = withAlpha(theme.accent, 0.15); e.currentTarget.style.boxShadow = 'none'; }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <span style={{ fontFamily: "'Quicksand', sans-serif", fontWeight: 700, fontSize: 16, color: theme.textPrimary, lineHeight: 1.3 }}>{book.title}</span>
+                <span style={{ fontSize: 16, flexShrink: 0 }}>{langFlag(book.lang)}</span>
+              </div>
+              {book.author && (
+                <span style={{ fontFamily: "'Quicksand', sans-serif", fontSize: 12, color: theme.textSecondary }}>{book.author}</span>
+              )}
+              {book.genre && (
+                <span style={{ display: 'inline-block', alignSelf: 'flex-start', padding: '2px 10px', borderRadius: 999, backgroundColor: withAlpha(theme.secondary, 0.12), color: theme.secondary, fontFamily: "'Quicksand', sans-serif", fontWeight: 600, fontSize: 11 }}>
+                  {book.genre}
+                </span>
+              )}
+              <p style={{ fontFamily: "'Quicksand', sans-serif", fontSize: 12, color: theme.textSecondary, lineHeight: 1.5, margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                {book.content.slice(0, 100)}...
+              </p>
+            </button>
+          ))}
+        </div>
+
+        {/* User stories */}
+        {stories.length > 0 && (
+          <div>
+            <p style={{ fontFamily: "'Quicksand', sans-serif", fontSize: 14, fontWeight: 600, color: theme.textSecondary, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Your Stories
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 20 }}>
+              {stories.map((s) => (
+                <Card key={s.id} onClick={() => openStory(s)} style={{ display: 'flex', flexDirection: 'column', gap: 10, position: 'relative' }}>
+                  <div style={{ fontSize: 48 }} aria-hidden="true">{coverFor(s.id)}</div>
+                  <div style={{ fontFamily: "'Quicksand', sans-serif", fontWeight: 700, fontSize: 18, color: theme.textPrimary }}>
+                    {s.title || t.untitled}
+                  </div>
+                  {s.accessible && (
+                    <span style={{ display: 'inline-block', alignSelf: 'flex-start', padding: '4px 12px', borderRadius: 999, backgroundColor: withAlpha(theme.secondary, 0.18), color: theme.secondary, fontFamily: "'Quicksand', sans-serif", fontWeight: 700, fontSize: 13 }}>
+                      {t.bionicReady}
+                    </span>
+                  )}
+                  <button
+                    type="button" aria-label="Delete story"
+                    onClick={(e) => deleteStory(e, s.id)}
+                    style={{ position: 'absolute', top: 8, right: 8, background: 'none', border: 'none', cursor: 'pointer', color: theme.textSecondary, padding: 4, borderRadius: 8 }}
+                  >
+                    <X size={16} />
+                  </button>
+                </Card>
+              ))}
+            </div>
           </div>
         )}
       </div>
