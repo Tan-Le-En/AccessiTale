@@ -1081,7 +1081,16 @@ function TopBar() {
         </div>
         <span style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 20, color: theme.textPrimary }}>{t.appName}</span>
       </button>
-      <IconButton icon={SettingsIcon} label={t.settings} onClick={() => setShowSettings(true)} />
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+        <button type="button" onClick={() => setView('booklibrary')}
+          style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12, border: `1.5px solid ${withAlpha(theme.accent, 0.2)}`, backgroundColor: 'transparent', cursor: 'pointer', fontFamily: "'Quicksand', sans-serif", fontWeight: 600, fontSize: 14, color: theme.textPrimary, transition: 'background-color 180ms ease-out' }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = withAlpha(theme.accent, 0.1); }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}>
+          <LibraryIcon size={16} aria-hidden="true" />
+          <span>Library</span>
+        </button>
+        <IconButton icon={SettingsIcon} label={t.settings} onClick={() => setShowSettings(true)} />
+      </div>
     </div>
   );
 }
@@ -1116,6 +1125,13 @@ function Header({ onNewStory }) {
         <span style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 24, color: theme.textPrimary }}>{t.appName}</span>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <button type="button" onClick={() => setView('booklibrary')}
+          style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '8px 14px', borderRadius: 12, border: `1.5px solid ${withAlpha(theme.accent, 0.2)}`, backgroundColor: 'transparent', cursor: 'pointer', fontFamily: "'Quicksand', sans-serif", fontWeight: 600, fontSize: 14, color: theme.textPrimary, transition: 'background-color 180ms ease-out' }}
+          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = withAlpha(theme.accent, 0.1); }}
+          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; }}>
+          <LibraryIcon size={16} aria-hidden="true" />
+          <span>Library</span>
+        </button>
         <div style={{ display: window.innerWidth < 640 ? 'none' : 'block' }}>
           <Button variant="primary" onClick={onNewStory} style={{ padding: '10px 20px', fontSize: 16 }}>
             <Plus size={18} aria-hidden="true" /> {t.newStory.replace('+ ', '')}
@@ -1476,7 +1492,6 @@ function coverFor(id) {
 
 function LibraryView() {
   const { theme, t, language, stories, setStories, setView, setCurrentStoryId } = useApp();
-  const [libFilter, setLibFilter] = useState('all');
 
   const handleNewStory = () => {
     const id = `story-${Date.now()}`;
@@ -1495,21 +1510,12 @@ function LibraryView() {
     setStories((prev) => prev.filter((s) => s.id !== id));
   };
 
-  const loadBook = (book) => {
+  const loadSample = (sample) => {
     const id = `story-${Date.now()}`;
-    setStories((prev) => [{ id, title: book.title, content: book.content, accessible: true, createdAt: Date.now() }, ...prev]);
+    setStories((prev) => [{ id, title: sample.title, content: sample.content, accessible: true, createdAt: Date.now() }, ...prev]);
     setCurrentStoryId(id);
     setView('read');
   };
-
-  const filteredBooks = libFilter === 'all' ? ALL_BOOKS : ALL_BOOKS.filter((b) => b.lang === libFilter);
-  const langFlag = (l) => l === 'en' ? '\uD83C\uDDEC\uD83C\uDDE7' : l === 'ms' ? '\uD83C\uDDF2\uD83C\uDDFE' : '\uD83C\uDDE8\uD83C\uDDF3';
-  const langTabs = [
-    { key: 'all', label: t.language || 'All' },
-    { key: 'en', label: 'English' },
-    { key: 'ms', label: 'Bahasa Melayu' },
-    { key: 'zh', label: '\u4E2D\u6587' },
-  ];
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: theme.bg }}>
@@ -1520,9 +1526,131 @@ function LibraryView() {
             <Plus size={20} aria-hidden="true" /> {t.newStory.replace('+ ', '')}
           </Button>
         </div>
+        <div style={{ marginBottom: 28 }}>
+          <p style={{ fontFamily: "'Quicksand', sans-serif", fontSize: 14, fontWeight: 600, color: theme.textSecondary, marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{t.trySample}</p>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+            {SAMPLE_SCRIPTS.map((sample) => (
+              <button key={sample.id} type="button" onClick={() => loadSample(sample)}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 16px', borderRadius: 14, border: `2px solid ${withAlpha(theme.accent, 0.3)}`, backgroundColor: withAlpha(theme.accent, 0.08), cursor: 'pointer', fontFamily: "'Quicksand', sans-serif", fontWeight: 600, fontSize: 15, color: theme.textPrimary, transition: 'background-color 180ms ease-out, border-color 180ms ease-out', minHeight: 44 }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = withAlpha(theme.accent, 0.18); e.currentTarget.style.borderColor = theme.accent; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = withAlpha(theme.accent, 0.08); e.currentTarget.style.borderColor = withAlpha(theme.accent, 0.3); }}>
+                <span>{sample.title}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+        {stories.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '64px 16px' }}>
+            <div style={{ fontSize: 64, marginBottom: 16 }} aria-hidden="true">📚</div>
+            <p style={{ fontFamily: "'Quicksand', sans-serif", fontSize: 20, fontWeight: 600, color: theme.textPrimary, marginBottom: 24 }}>{t.emptyTitle}</p>
+            <Button variant="primary" onClick={handleNewStory}>
+              <Sparkles size={18} aria-hidden="true" /> {t.emptyCta}
+            </Button>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 20 }}>
+            {stories.map((s) => (
+              <Card key={s.id} onClick={() => openStory(s)} style={{ display: 'flex', flexDirection: 'column', gap: 10, position: 'relative' }}>
+                <div style={{ fontSize: 48 }} aria-hidden="true">{coverFor(s.id)}</div>
+                <div style={{ fontFamily: "'Quicksand', sans-serif", fontWeight: 700, fontSize: 18, color: theme.textPrimary }}>
+                  {s.title || t.untitled}
+                </div>
+                {s.accessible && (
+                  <span style={{ display: 'inline-block', alignSelf: 'flex-start', padding: '4px 12px', borderRadius: 999, backgroundColor: withAlpha(theme.secondary, 0.18), color: theme.secondary, fontFamily: "'Quicksand', sans-serif", fontWeight: 700, fontSize: 13 }}>
+                    {t.bionicReady}
+                  </span>
+                )}
+                <button
+                  type="button" aria-label="Delete story"
+                  onClick={(e) => deleteStory(e, s.id)}
+                  style={{ position: 'absolute', top: 8, right: 8, background: 'none', border: 'none', cursor: 'pointer', color: theme.textSecondary, padding: 4, borderRadius: 8 }}
+                >
+                  <X size={16} />
+                </button>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
-        {/* Language filter tabs */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
+/* =====================================================
+   BOOK LIBRARY — Full 60-book collection
+===================================================== */
+function BookLibraryView() {
+  const { theme, t, stories, setStories, setView, setCurrentStoryId } = useApp();
+  const [libFilter, setLibFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const loadBook = (book) => {
+    const id = `story-${Date.now()}`;
+    setStories((prev) => [{ id, title: book.title, content: book.content, accessible: true, createdAt: Date.now() }, ...prev]);
+    setCurrentStoryId(id);
+    setView('read');
+  };
+
+  const filteredBooks = ALL_BOOKS.filter((b) => {
+    const matchesLang = libFilter === 'all' || b.lang === libFilter;
+    const matchesSearch = !searchQuery || b.title.toLowerCase().includes(searchQuery.toLowerCase()) || (b.author && b.author.toLowerCase().includes(searchQuery.toLowerCase()));
+    return matchesLang && matchesSearch;
+  });
+
+  const langFlag = (l) => l === 'en' ? '\uD83C\uDDEC\uD83C\uDDE7' : l === 'ms' ? '\uD83C\uDDF2\uD83C\uDDFE' : '\uD83C\uDDE8\uD83C\uDDF3';
+  const langTabs = [
+    { key: 'all', label: 'All' },
+    { key: 'en', label: 'English' },
+    { key: 'ms', label: 'Bahasa Melayu' },
+    { key: 'zh', label: '\u4E2D\u6587' },
+  ];
+
+  return (
+    <div style={{ minHeight: '100vh', backgroundColor: theme.bg }}>
+      {/* Back nav */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 24px' }}>
+        <button type="button" onClick={() => setView('library')}
+          style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+          aria-label="Back to library">
+          <div style={{ width: 36, height: 36, borderRadius: 12, backgroundColor: theme.accent, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <BookOpen size={20} color="#fff" aria-hidden="true" />
+          </div>
+          <span style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 700, fontSize: 20, color: theme.textPrimary }}>{t.appName}</span>
+        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontFamily: "'Quicksand', sans-serif", fontWeight: 700, fontSize: 18, color: theme.accent }}>
+            <LibraryIcon size={20} style={{ verticalAlign: 'middle', marginRight: 6 }} />
+            Library
+          </span>
+          <IconButton icon={SettingsIcon} label={t.settings} onClick={() => {}} />
+        </div>
+      </div>
+
+      <div style={{ padding: '0 24px 100px' }}>
+        {/* Title */}
+        <h1 style={{ fontFamily: "'Poppins', sans-serif", fontSize: 28, fontWeight: 700, color: theme.textPrimary, marginBottom: 4 }}>
+          Book Library
+        </h1>
+        <p style={{ fontFamily: "'Quicksand', sans-serif", fontSize: 14, color: theme.textSecondary, marginBottom: 20 }}>
+          60 books across 3 languages — tap any to start reading
+        </p>
+
+        {/* Search */}
+        <div style={{ position: 'relative', marginBottom: 16 }}>
+          <input
+            type="text" placeholder="Search by title or author..."
+            value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ width: '100%', maxWidth: 400, padding: '10px 16px 10px 40px', borderRadius: 14, border: `2px solid ${withAlpha(theme.accent, 0.2)}`, backgroundColor: theme.panel, fontFamily: "'Quicksand', sans-serif", fontSize: 15, color: theme.textPrimary, outline: 'none', transition: 'border-color 180ms ease-out' }}
+            onFocus={(e) => { e.target.style.borderColor = theme.accent; }}
+            onBlur={(e) => { e.target.style.borderColor = withAlpha(theme.accent, 0.2); }}
+          />
+          <div style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: theme.textSecondary, pointerEvents: 'none' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          </div>
+        </div>
+
+        {/* Language tabs */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
           {langTabs.map((tab) => (
             <button key={tab.key} type="button" onClick={() => setLibFilter(tab.key)}
               style={{ padding: '8px 18px', borderRadius: 999, border: 'none', cursor: 'pointer', fontFamily: "'Quicksand', sans-serif", fontWeight: 700, fontSize: 14, transition: 'all 180ms ease-out', minHeight: 36,
@@ -1540,13 +1668,13 @@ function LibraryView() {
         </p>
 
         {/* Book grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: 16, marginBottom: 40 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: 16 }}>
           {filteredBooks.map((book) => (
             <button key={book.id} type="button" onClick={() => loadBook(book)}
-              style={{ textAlign: 'left', padding: 16, borderRadius: 14, border: `1.5px solid ${withAlpha(theme.accent, 0.15)}`, backgroundColor: theme.panel, cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 8, transition: 'border-color 180ms ease-out, box-shadow 180ms ease-out', minHeight: 44 }}
-              onMouseEnter={(e) => { e.currentTarget.style.borderColor = theme.accent; e.currentTarget.style.boxShadow = `0 2px 12px ${withAlpha(theme.accent, 0.12)}`; }}
+              style={{ textAlign: 'left', padding: 18, borderRadius: 14, border: `1.5px solid ${withAlpha(theme.accent, 0.15)}`, backgroundColor: theme.panel, cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 8, transition: 'border-color 180ms ease-out, box-shadow 180ms ease-out', minHeight: 44 }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = theme.accent; e.currentTarget.style.boxShadow = `0 4px 16px ${withAlpha(theme.accent, 0.12)}`; }}
               onMouseLeave={(e) => { e.currentTarget.style.borderColor = withAlpha(theme.accent, 0.15); e.currentTarget.style.boxShadow = 'none'; }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
                 <span style={{ fontFamily: "'Quicksand', sans-serif", fontWeight: 700, fontSize: 16, color: theme.textPrimary, lineHeight: 1.3 }}>{book.title}</span>
                 <span style={{ fontSize: 16, flexShrink: 0 }}>{langFlag(book.lang)}</span>
               </div>
@@ -1559,40 +1687,15 @@ function LibraryView() {
                 </span>
               )}
               <p style={{ fontFamily: "'Quicksand', sans-serif", fontSize: 12, color: theme.textSecondary, lineHeight: 1.5, margin: 0, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                {book.content.slice(0, 100)}...
+                {book.content.slice(0, 120)}...
               </p>
             </button>
           ))}
         </div>
 
-        {/* User stories */}
-        {stories.length > 0 && (
-          <div>
-            <p style={{ fontFamily: "'Quicksand', sans-serif", fontSize: 14, fontWeight: 600, color: theme.textSecondary, marginBottom: 12, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              Your Stories
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 20 }}>
-              {stories.map((s) => (
-                <Card key={s.id} onClick={() => openStory(s)} style={{ display: 'flex', flexDirection: 'column', gap: 10, position: 'relative' }}>
-                  <div style={{ fontSize: 48 }} aria-hidden="true">{coverFor(s.id)}</div>
-                  <div style={{ fontFamily: "'Quicksand', sans-serif", fontWeight: 700, fontSize: 18, color: theme.textPrimary }}>
-                    {s.title || t.untitled}
-                  </div>
-                  {s.accessible && (
-                    <span style={{ display: 'inline-block', alignSelf: 'flex-start', padding: '4px 12px', borderRadius: 999, backgroundColor: withAlpha(theme.secondary, 0.18), color: theme.secondary, fontFamily: "'Quicksand', sans-serif", fontWeight: 700, fontSize: 13 }}>
-                      {t.bionicReady}
-                    </span>
-                  )}
-                  <button
-                    type="button" aria-label="Delete story"
-                    onClick={(e) => deleteStory(e, s.id)}
-                    style={{ position: 'absolute', top: 8, right: 8, background: 'none', border: 'none', cursor: 'pointer', color: theme.textSecondary, padding: 4, borderRadius: 8 }}
-                  >
-                    <X size={16} />
-                  </button>
-                </Card>
-              ))}
-            </div>
+        {filteredBooks.length === 0 && (
+          <div style={{ textAlign: 'center', padding: '64px 16px' }}>
+            <p style={{ fontFamily: "'Quicksand', sans-serif", fontSize: 18, fontWeight: 600, color: theme.textSecondary }}>No books found</p>
           </div>
         )}
       </div>
@@ -2224,6 +2327,7 @@ export default function App() {
 
   let ViewComponent = LandingView;
   if (view === 'library') ViewComponent = LibraryView;
+  else if (view === 'booklibrary') ViewComponent = BookLibraryView;
   else if (view === 'write') ViewComponent = WriteView;
   else if (view === 'read') ViewComponent = ReadingView;
   else if (view === 'focus') ViewComponent = FocusMode;
